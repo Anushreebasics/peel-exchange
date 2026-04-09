@@ -1,0 +1,260 @@
+{
+  "users": [
+    {
+      "id": "3b1dcb42-1902-47a8-a6e7-bc80db2bc2bb",
+      "email": "banana@example.com",
+      "passwordHash": "$2b$10$5ofDBJlU38zV7zCWh0/FAe1pji7GXdA56JnJQUfWKBU3lHdNNu4K.",
+      "displayName": "Banana Pilot",
+      "createdAt": "2026-04-05T08:30:35.600Z",
+      "lastLoginAt": "2026-04-05T08:31:20.203Z"
+    }
+  ],
+  "profiles": {
+    "3b1dcb42-1902-47a8-a6e7-bc80db2bc2bb": {
+      "player": {
+        "cash": 1500,
+        "xp": 0,
+        "level": 1,
+        "holdings": {},
+        "creatorWallet": 0,
+        "lastDailyRewardAt": null,
+        "lastTickAt": 1775654497212,
+        "avgCost": {},
+        "loginStreak": 0,
+        "lastLoginDate": null
+      },
+      "log": [
+        "Welcome to Banana Trading Company. Buy low, sell high, and publish your own cards when you break through."
+      ],
+      "trades": []
+    }
+  },
+  "market": {
+    "day": 114,
+    "tick": 1363,
+    "cards": [
+      {
+        "momentum": 0.00042910722262278855,
+        "priceHistory": [
+          523,
+          479,
+          614,
+          808,
+          825,
+          853,
+          917,
+          941,
+          966,
+          980,
+          996,
+          1001,
+          1004,
+          991
+        ],
+        "id": "btc",
+        "name": "Banana Treasury Chain",
+        "symbol": "BTCN",
+        "category": "Infrastructure",
+        "basePrice": 611,
+        "volatility": 0.18,
+        "demandBias": 0.004968455438607212,
+        "creatorShare": 0.08,
+        "supplyMode": "limited",
+        "supply": 900,
+        "owned": 0
+      },
+      {
+        "momentum": 0.014596507881400218,
+        "priceHistory": [
+          467,
+          572,
+          590,
+          536,
+          557,
+          612,
+          666,
+          685,
+          669,
+          614,
+          694,
+          631,
+          623,
+          671
+        ],
+        "id": "ape",
+        "name": "Ape Arcade Media",
+        "symbol": "APE",
+        "category": "Entertainment",
+        "basePrice": 418,
+        "volatility": 0.24,
+        "demandBias": -0.00013399388965309268,
+        "creatorShare": 0.12,
+        "supplyMode": "unlimited",
+        "supply": 0,
+        "owned": 0
+      },
+      {
+        "momentum": -1.3256442787988423e-7,
+        "priceHistory": [
+          311,
+          288,
+          294,
+          414,
+          653,
+          647,
+          574,
+          712,
+          824,
+          812,
+          821,
+          725,
+          845,
+          859
+        ],
+        "id": "gro",
+        "name": "Golden Grove Logistics",
+        "symbol": "GRO",
+        "category": "Supply Chain",
+        "basePrice": 524,
+        "volatility": 0.15,
+        "demandBias": 0.01020581084440177,
+        "creatorShare": 0.1,
+        "supplyMode": "limited",
+        "supply": 600,
+        "owned": 0
+      },
+      {
+        "momentum": 0.01909390832823621,
+        "priceHistory": [
+          215,
+          216,
+          221,
+          228,
+          240,
+          275,
+          304,
+          316,
+          324,
+          332,
+          337,
+          340,
+          336,
+          332
+        ],
+        "id": "news",
+        "name": "Daily Peel Press",
+        "symbol": "DPP",
+        "category": "Publishing",
+        "basePrice": 188,
+        "volatility": 0.31,
+        "demandBias": 0.017064837081195855,
+        "creatorShare": 0.15,
+        "supplyMode": "unlimited",
+        "supply": 0,
+        "owned": 0
+      }
+    ],
+    "news": [
+      {
+        "id": "n-1363",
+        "title": "Scarcity premium builds in limited cards",
+        "body": "As mint counts approach supply caps, early holders are sitting on significant unrealized gains.",
+        "mood": "positive",
+        "impact": "limited supply premium +8%"
+      },
+      {
+        "id": "n-1362",
+        "title": "Creator wallets distributed on schedule",
+        "body": "Royalty streams credited to all active card publishers. Passive income is the new alpha.",
+        "mood": "positive",
+        "impact": "royalties credited"
+      },
+      {
+        "id": "n-1361",
+        "title": "Momentum indicators flash mixed signals",
+        "body": "Short-term trend followers are cautious as oscillators reach neutral zones.",
+        "mood": "neutral",
+        "impact": "watch volatility"
+      },
+      {
+        "id": "n-1360",
+        "title": "Liquidity thickens on the Peel Exchange",
+        "body": "Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.",
+        "mood": "positive",
+        "impact": "lower fees for limit orders"
+      },
+      {
+        "id": "n-1359",
+        "title": "New traders enter the exchange in waves",
+        "body": "Onboarding activity is up. More buyers means higher natural demand pressure across the board.",
+        "mood": "positive",
+        "impact": "crowd interest +5%"
+      },
+      {
+        "id": "n-1358",
+        "title": "Scarcity premium builds in limited cards",
+        "body": "As mint counts approach supply caps, early holders are sitting on significant unrealized gains.",
+        "mood": "positive",
+        "impact": "limited supply premium +8%"
+      },
+      {
+        "id": "n-1357",
+        "title": "Creator wallets distributed on schedule",
+        "body": "Royalty streams credited to all active card publishers. Passive income is the new alpha.",
+        "mood": "positive",
+        "impact": "royalties credited"
+      },
+      {
+        "id": "n-1356",
+        "title": "Momentum indicators flash mixed signals",
+        "body": "Short-term trend followers are cautious as oscillators reach neutral zones.",
+        "mood": "neutral",
+        "impact": "watch volatility"
+      },
+      {
+        "id": "n-1355",
+        "title": "Liquidity thickens on the Peel Exchange",
+        "body": "Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.",
+        "mood": "positive",
+        "impact": "lower fees for limit orders"
+      },
+      {
+        "id": "n-1354",
+        "title": "Peel Protocol upgrade announced",
+        "body": "Governance vote passes — infrastructure cards rally.",
+        "mood": "positive",
+        "impact": "DPP +13%",
+        "cardSymbol": "DPP",
+        "priceDelta": 0.13
+      }
+    ],
+    "leaderboard": [
+      {
+        "name": "Banana Pilot",
+        "netWorth": 1500,
+        "streak": 1,
+        "rank": 1
+      }
+    ]
+  },
+  "events": [
+    {
+      "id": "banana-shortage",
+      "title": "Banana shortage",
+      "body": "All prices surge as supply tightens across the exchange.",
+      "mood": "positive",
+      "impact": "+10% market-wide",
+      "createdAt": "2026-04-05T08:29:55.626Z"
+    },
+    {
+      "id": "whale-watch",
+      "title": "Whale watch alert",
+      "body": "Large wallets face increasing taxes and slippage.",
+      "mood": "neutral",
+      "impact": "anti-whale tax active",
+      "createdAt": "2026-04-05T08:29:55.627Z"
+    }
+  ],
+  "circuitBreakers": {},
+  "anomalyFlags": {}
+}
