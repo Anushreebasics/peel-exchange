@@ -46,6 +46,7 @@ export type PlayerState = {
   lastLoginDate: string | null;          // ISO date string YYYY-MM-DD
   loginStreak: number;
   lastTickAt: number;
+  rumors?: string[];
 };
 
 export type MarketState = {
@@ -314,6 +315,7 @@ export function createInitialState(): GameState {
       lastLoginDate: null,
       loginStreak: 0,
       lastTickAt: Date.now(),
+      rumors: [],
     },
     market: {
       day: 1,
@@ -365,6 +367,7 @@ export function loadState(): GameState {
         avgCost: parsed.player.avgCost ?? {},
         loginStreak: parsed.player.loginStreak ?? 0,
         lastLoginDate: parsed.player.lastLoginDate ?? null,
+        rumors: parsed.player.rumors ?? [],
       },
       market: {
         ...parsed.market,
@@ -571,6 +574,66 @@ export function claimDailyReward(state: GameState): GameState {
         ? `Daily reward claimed: ${formatCurrency(reward)} 🍌 (${newStreak}-day streak × ${streakBonus.toFixed(1)}x!)`
         : `Daily reward claimed: ${formatCurrency(reward)}.`,
     ].concat(state.log).slice(0, 12),
+  };
+}
+
+// ── Information Economy Options ────────────────────────────────────────────
+export function buyRumor(state: GameState): GameState {
+  const cost = 500;
+  if (state.player.cash < cost) {
+    return { ...state, log: [`You need ${formatCurrency(cost)} to buy a rumor.`].concat(state.log).slice(0, 12) };
+  }
+
+  // Peek ahead to find next event
+  let hint = 'Insiders are quiet. No major events expected soon.';
+  for (let t = state.market.tick + 1; t <= state.market.tick + 20; t++) {
+    const eventRoll = seededRandom(t * 7 + 13);
+    const triggerEvent = eventRoll > 0.88;
+    if (triggerEvent) {
+      const eventTargetIndex = Math.floor(seededRandom(t) * state.market.cards.length);
+      const targetCard = state.market.cards[eventTargetIndex];
+      // Rumors might be inaccurate if cards list changes, adding fun chaos
+      hint = `Whispers say ${targetCard.symbol} might see major movement around tick ${t}.`;
+      break;
+    }
+  }
+
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      cash: state.player.cash - cost,
+      rumors: [hint, ...(state.player.rumors ?? [])].slice(0, 10),
+    },
+    log: [`Bought an insider rumor for ${formatCurrency(cost)}.`].concat(state.log).slice(0, 12),
+  };
+}
+
+export function runAdCampaign(state: GameState, cardId: string): GameState {
+  const cost = 1000;
+  if (state.player.cash < cost) {
+    return { ...state, log: [`Not enough cash for an ad campaign. Need ${formatCurrency(cost)}.`].concat(state.log).slice(0, 12) };
+  }
+
+  const cardIndex = state.market.cards.findIndex(c => c.id === cardId);
+  if (cardIndex === -1) return state;
+
+  const card = state.market.cards[cardIndex];
+  const updatedCards = [...state.market.cards];
+  updatedCards[cardIndex] = {
+    ...card,
+    momentum: clamp((card.momentum ?? 0) + 0.25, -0.45, 0.45),
+    demandBias: clamp(card.demandBias + 0.08, -0.12, 0.15),
+  };
+
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      cash: state.player.cash - cost,
+    },
+    market: { ...state.market, cards: updatedCards },
+    log: [`Launched an ad campaign for ${card.symbol}. Momentum boosted! (-${formatCurrency(cost)})`].concat(state.log).slice(0, 12),
   };
 }
 

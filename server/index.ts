@@ -5,9 +5,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { resolve } from 'path';
+import { Server as SocketServer } from 'socket.io';
 import {
   advanceGlobalMarket,
   buyForUser,
+  buyRumorForUser,
   claimRewardForUser,
   computeNetWorth,
   createUser,
@@ -25,6 +27,7 @@ import {
   loadStore,
   publishForUser,
   resetUser,
+  runAdCampaignForUser,
   saveStore,
   sellForUser,
   touchLogin,
@@ -34,6 +37,9 @@ import {
   type Store,
   type ValidationError,
 } from './store';
+import { bootstrapBots } from './bots';
+import { prisma } from './prisma';
+import { processLimitOrders } from './matching';
 
 dotenv.config();
 
@@ -92,9 +98,19 @@ function publicUser(user: StoredUser) {
   };
 }
 
+// `io` will be assigned when the server starts
+let io: SocketServer;
+
 async function commitStore() {
   store.market.leaderboard = getLeaderboard(store);
   await saveStore(store);
+  if (io) {
+    io.emit('market_update', { 
+      market: store.market, 
+      news: getNews(store), 
+      events: getEvents(store) 
+    });
+  }
 }
 
 function serializeState(userId: string) {
@@ -121,6 +137,13 @@ const publishSchema = z.object({
   creatorShare: z.number().min(0.02).max(0.4),
   supplyMode: z.enum(['limited', 'unlimited']),
   supply: z.number().int().min(1).max(10000),
+});
+
+const orderSchema = z.object({
+  cardId: z.string().min(1),
+  quantity: z.number().int().positive().max(1000),
+  targetPrice: z.number().int().positive(),
+  side: z.enum(['buy', 'sell']),
 });
 
 app.get('/api/health', (_req, res) => {
@@ -241,6 +264,42 @@ app.post('/api/game/sell', requireAuth, async (req, res) => {
   res.json({ state: result.state, trade: result.trade });
 });
 
+app.get('/api/game/orders', requireAuth, async (req, res) => {
+  const user = (req as express.Request & { user: StoredUser }).user;
+  const orders = await prisma.order.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+  });
+  res.json({ orders });
+});
+
+app.post('/api/game/order', requireAuth, async (req, res) => {
+  const user = (req as express.Request & { user: StoredUser }).user;
+  const parsed = orderSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Invalid order parameters' });
+    return;
+  }
+
+  const state = getGameState(store, user.id);
+  if (parsed.data.side === 'buy' && state.player.cash < parsed.data.targetPrice * parsed.data.quantity) {
+    res.status(400).json({ error: 'Insufficient funds for limit order' });
+    return;
+  }
+
+  const order = await prisma.order.create({
+    data: {
+      userId: user.id,
+      cardId: parsed.data.cardId,
+      side: parsed.data.side,
+      targetPrice: parsed.data.targetPrice,
+      quantity: parsed.data.quantity,
+    }
+  });
+
+  res.json({ order });
+});
+
 app.post('/api/game/publish', requireAuth, async (req, res) => {
   const user = (req as express.Request & { user: StoredUser }).user;
   const parsed = publishSchema.safeParse(req.body);
@@ -264,6 +323,36 @@ app.post('/api/game/reward/daily', requireAuth, async (req, res) => {
   const result = claimRewardForUser(store, user.id);
   if (!result) {
     res.status(400).json({ error: 'Daily reward already claimed' });
+    return;
+  }
+
+  await commitStore();
+  res.json({ state: result.state });
+});
+
+app.post('/api/game/rumor', requireAuth, async (req, res) => {
+  const user = (req as express.Request & { user: StoredUser }).user;
+  const result = buyRumorForUser(store, user.id);
+  if (!result) {
+    res.status(400).json({ error: 'Failed to buy rumor' });
+    return;
+  }
+
+  await commitStore();
+  res.json({ state: result.state });
+});
+
+app.post('/api/game/advertise', requireAuth, async (req, res) => {
+  const user = (req as express.Request & { user: StoredUser }).user;
+  const parsed = cardActionSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Invalid advertise payload' });
+    return;
+  }
+
+  const result = runAdCampaignForUser(store, user.id, parsed.data.cardId);
+  if (!result) {
+    res.status(400).json({ error: 'Failed to run ad campaign' });
     return;
   }
 
@@ -327,13 +416,28 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`Banana Trading Company API listening on http://localhost:${PORT}`);
+  await bootstrapBots(store, commitStore);
+  console.log('🤖 AI Market Makers booted and lurking.');
+});
+
+io = new SocketServer(server, { cors: { origin: CLIENT_ORIGIN, credentials: true } });
+
+io.on('connection', (socket) => {
+  socket.emit('market_update', { 
+    market: store.market, 
+    news: getNews(store), 
+    events: getEvents(store) 
+  });
 });
 
 setInterval(async () => {
   advanceGlobalMarket(store);
-  await saveStore(store);
+  // Re-check order book constraints against fresh price ticks
+  await processLimitOrders(store, commitStore);
+  // Commit any standard tick shifts
+  await commitStore();
 }, 45_000);
 
 process.on('SIGINT', async () => {

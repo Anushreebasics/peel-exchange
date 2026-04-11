@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+
+  // Game state
+  cash          Int      @default(1500)
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  creatorWallet Int      @default(0)
+  lastDailyRewardAt DateTime?
+  lastLoginDate String?
+  loginStreak   Int      @default(0)
+  lastTickAt    DateTime @default(now())
+  rumors        String   @default("[]") // JSON stringified
+
+  holdings      Holding[]
+  trades        Trade[]
+  orders        Order[]
+}
+
+model Card {
+  id                String   @id
+  name              String
+  symbol            String   @unique
+  category          String
+  basePrice         Int
+  volatility        Float
+  demandBias        Float
+  creatorShare      Float
+  supplyMode        String
+  supply            Int
+  owned             Int
+  momentum          Float
+  priceHistory      String   @default("[]") // JSON stringified
+  publishedByPlayer Boolean  @default(false)
+  publisherId       String?
+
+  holdings Holding[]
+  trades   Trade[]
+  orders   Order[]
+}
+
+model Holding {
+  id      String @id @default(uuid())
+  userId  String
+  cardId  String
+  qty     Int
+  avgCost Int
+
+  user User @relation(fields: [userId], references: [id])
+  card Card @relation(fields: [cardId], references: [id])
+
+  @@unique([userId, cardId])
+}
+
+model Trade {
+  id           String   @id @default(uuid())
+  userId       String
+  cardId       String
+  cardSymbol   String
+  side         String   // "buy" | "sell"
+  quantity     Int
+  pricePerUnit Int
+  feePaid      Int
+  slippagePaid Int
+  totalValue   Int
+  pnl          Int
+  executedAt   DateTime @default(now())
+  marketTick   Int
+
+  user User @relation(fields: [userId], references: [id])
+  card Card @relation(fields: [cardId], references: [id])
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  userId     String
+  cardId     String
+  side       String   // "buy" | "sell"
+  targetPrice Int
+  quantity   Int
+  status     String   @default("open") // "open" | "filled" | "cancelled"
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  card Card @relation(fields: [cardId], references: [id])
+}
+
+model MarketEvent {
+  id         String   @id @default(uuid())
+  title      String
+  body       String
+  mood       String
+  impact     String
+  cardSymbol String?
+  createdAt  DateTime @default(now())
+}
+
+model GlobalState {
+  id          Int    @id @default(1)
+  day         Int    @default(1)
+  tick        Int    @default(0)
+  news        String @default("[]") // JSON stringified
+}
+
+model CircuitBreaker {
+  cardId                String   @id
+  isBroken              Boolean  @default(false)
+  reason                String
+  brokenAt              DateTime @default(now())
+  recoversAt            DateTime
+  maxPriceChangePercent Float    @default(0)
+}
+
+model AnomalyFlag {
+  id                 String   @id @default(uuid())
+  userId             String
+  cardId             String
+  isWashTrading      Boolean
+  washTradingScore   Int
+  isUnusualVolume    Boolean
+  volumeDeviation    Int
+  isPriceSpike       Boolean
+  priceChangePercent Int
+  riskLevel          String
+  createdAt          DateTime @default(now())
+
+  @@unique([userId, cardId])
+}
+
+model AuditEntry {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  cardId    String?
+  quantity  Int?
+  reason    String?
+  details   String   @default("{}") // JSON stringified
+  createdAt DateTime @default(now())
+}

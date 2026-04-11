@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   advanceMarket,
   buyCard,
+  buyRumor,
   claimDailyReward,
   createInitialState,
   formatCurrency,
@@ -10,6 +11,7 @@ import {
   getProgression,
   loadState,
   publishCard,
+  runAdCampaign,
   saveState,
   sellCard,
   type GameState,
@@ -18,6 +20,7 @@ import {
 import {
   advanceMarket as apiAdvanceMarket,
   buyCard as apiBuyCard,
+  buyRumor as apiBuyRumor,
   claimDailyReward as apiClaimDailyReward,
   clearStoredToken,
   getCurrentSession,
@@ -25,11 +28,14 @@ import {
   logIn,
   publishCard as apiPublishCard,
   resetGame as apiResetGame,
+  runAdCampaign as apiRunAdCampaign,
   setStoredToken,
   signUp,
   sellCard as apiSellCard,
   type ApiUser,
+  placeLimitOrder,
 } from './lib/api';
+import { io, Socket } from 'socket.io-client';
 import MarketCard from './components/MarketCard';
 import Leaderboard from './components/Leaderboard';
 import Newspaper from './components/Newspaper';
@@ -175,11 +181,32 @@ function App() {
     window.localStorage.setItem(onboardingStorageKey, showOnboarding ? 'visible' : 'dismissed');
   }, [showOnboarding]);
 
-  // Auto market tick every 5s
+  // Auto market tick (Guest) or Live Streaming (Server)
   useEffect(() => {
-    const t = window.setInterval(() => setState(s => advanceMarket(s)), 5000);
-    return () => window.clearInterval(t);
-  }, []);
+    let socket: Socket | null = null;
+    let t: number | undefined;
+
+    if (authMode === 'guest') {
+      t = window.setInterval(() => setState(s => {
+        const next = advanceMarket(s);
+        saveState(next);
+        return next;
+      }), 5000);
+    } else {
+      socket = io('/', { path: '/socket.io' });
+      socket.on('market_update', (data: any) => {
+        setState(prev => {
+          if (!prev) return prev;
+          return { ...prev, market: data.market };
+        });
+      });
+    }
+
+    return () => {
+      if (t !== undefined) window.clearInterval(t);
+      if (socket) socket.disconnect();
+    };
+  }, [authMode]);
 
   const progression = useMemo(() => getProgression(state), [state]);
   const netWorth    = useMemo(() => getNetWorth(state),    [state]);
@@ -210,9 +237,33 @@ function App() {
     addToast(`Sold ${qty}× ${card?.symbol ?? cardId}`, 'sell');
   };
 
+  const handleOrder = async (cardId: string, side: 'buy'|'sell', targetPrice: number, qty: number) => {
+    if (authMode !== 'server') {
+      addToast('Limit Orders require an authenticated session!', 'error');
+      setShowAuthModal(true);
+      return;
+    }
+    try {
+      await placeLimitOrder(cardId, side, targetPrice, qty);
+      addToast(`Placed open ${side} limit order for ${qty}× at ${formatCurrency(targetPrice)}`, 'info');
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : String(e), 'error');
+    }
+  };
+
   const handleClaimReward = async () => {
     await mutate(() => claimDailyReward(state), () => apiClaimDailyReward());
     addToast('Daily reward claimed! 🎁', 'reward');
+  };
+
+  const handleBuyRumor = async () => {
+    await mutate(() => buyRumor(state), () => apiBuyRumor());
+    addToast('You bought an insider rumor! 🕵️', 'info');
+  };
+
+  const handleRunAdCampaign = async (cardId: string) => {
+    await mutate(() => runAdCampaign(state, cardId), () => apiRunAdCampaign(cardId));
+    addToast('Ad campaign launched! 📈', 'info');
   };
 
   const onboarding = useMemo(() => {
@@ -451,7 +502,7 @@ function App() {
               </div>
               <div className="market-grid">
                 {state.market.cards.map(card => (
-                  <MarketCard key={card.id} card={card} state={state} onBuy={handleBuy} onSell={handleSell} />
+                  <MarketCard key={card.id} card={card} state={state} onBuy={handleBuy} onSell={handleSell} onOrder={handleOrder} />
                 ))}
               </div>
             </div>
@@ -466,7 +517,7 @@ function App() {
                   <p className="page-desc">Your positions, cost basis, and unrealized P&L.</p>
                 </div>
               </div>
-              <Portfolio state={state} onSell={handleSell} />
+              <Portfolio state={state} onSell={handleSell} onRunAdCampaign={handleRunAdCampaign} />
             </div>
           )}
 
@@ -509,7 +560,13 @@ function App() {
                   <p className="page-desc">Dynamic headlines driven by real price events and market conditions.</p>
                 </div>
               </div>
-              <Newspaper news={state.market.news} market={state.market} />
+              <Newspaper 
+                news={state.market.news} 
+                market={state.market} 
+                rumors={state.player.rumors ?? []} 
+                onBuyRumor={handleBuyRumor} 
+                cash={state.player.cash} 
+              />
             </div>
           )}
 

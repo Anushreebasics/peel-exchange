@@ -3,6 +3,9 @@ import { type NewsItem, type MarketState, formatPercent } from '../game';
 type Props = {
   news: NewsItem[];
   market: MarketState;
+  rumors?: string[];
+  onBuyRumor?: () => void;
+  cash?: number;
 };
 
 function moodEmoji(mood: NewsItem['mood']) {
@@ -44,7 +47,7 @@ function MarketWeather({ market }: { market: MarketState }) {
   );
 }
 
-export default function Newspaper({ news, market }: Props) {
+export default function Newspaper({ news, market, rumors, onBuyRumor, cash }: Props) {
   const [lead, ...rest] = news;
 
   return (
@@ -58,6 +61,34 @@ export default function Newspaper({ news, market }: Props) {
         </div>
         <MarketWeather market={market} />
       </div>
+
+      {/* Rumor Mill */}
+      {onBuyRumor && rumors !== undefined && cash !== undefined && (
+        <div className="np-rumor-mill" style={{ background: 'var(--surface-sunken)', padding: '16px', borderRadius: '8px', marginBottom: '24px', border: '1px solid var(--border)' }}>
+          <h3 style={{ margin: '0 0 12px', fontSize: '1.2rem', color: 'var(--text-strong)' }}>🕵️ The Rumor Mill</h3>
+          <p style={{ margin: '0 0 16px', color: 'var(--text-muted)' }}>Pay insiders $500 for a hint about upcoming market events.</p>
+          <button 
+            type="button" 
+            onClick={onBuyRumor} 
+            disabled={cash < 500}
+            className="mc-execute-btn mc-buy-btn"
+            style={{ width: 'max-content', padding: '8px 16px', fontSize: '0.9rem', marginBottom: '16px' }}
+          >
+            Buy Tip ($500)
+          </button>
+          
+          {rumors.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <p style={{ margin: 0, fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Past Rumors</p>
+              {rumors.slice(0, 3).map((r, i) => (
+                <div key={i} style={{ background: 'var(--surface)', padding: '12px', borderRadius: '6px', borderLeft: '3px solid var(--brand-purple)', fontSize: '0.95rem' }}>
+                  "{r}"
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Lead story */}
       {lead && (

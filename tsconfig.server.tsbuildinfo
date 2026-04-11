@@ -1,1 +1,1 @@
-{"root":["./server/index.ts","./server/store.ts","./src/game.ts"],"version":"5.9.3"}
+{"root":["./server/bots.ts","./server/index.ts","./server/matching.ts","./server/migrate.ts","./server/prisma.ts","./server/store.ts","./src/game.ts"],"version":"5.9.3"}

@@ -15,6 +15,7 @@ type Props = {
   state: GameState;
   onBuy: (cardId: string, qty: number) => void;
   onSell: (cardId: string, qty: number) => void;
+  onOrder?: (cardId: string, side: 'buy'|'sell', targetPrice: number, qty: number) => void;
 };
 
 function Sparkline({ prices, positive }: { prices: number[]; positive: boolean }) {
@@ -52,9 +53,11 @@ function Sparkline({ prices, positive }: { prices: number[]; positive: boolean }
   );
 }
 
-export default function MarketCard({ card, state, onBuy, onSell }: Props) {
+export default function MarketCard({ card, state, onBuy, onSell, onOrder }: Props) {
   const [qty, setQty] = React.useState(1);
   const [tab, setTab] = React.useState<'buy' | 'sell'>('buy');
+  const [orderType, setOrderType] = React.useState<'market' | 'limit'>('market');
+  const [targetPrice, setTargetPrice] = React.useState<number>(card.basePrice);
 
   const price = getMarketPrice(card, state.market.tick, state.market.day);
   const holding = getHoldingCount(state, card.id);
@@ -136,17 +139,24 @@ export default function MarketCard({ card, state, onBuy, onSell }: Props) {
           <button
             type="button"
             className={`mc-tab ${tab === 'buy' ? 'mc-tab-active' : ''}`}
-            onClick={() => setTab('buy')}
+            onClick={() => { setTab('buy'); setTargetPrice(Math.round(price)); }}
           >
             Buy
           </button>
           <button
             type="button"
             className={`mc-tab ${tab === 'sell' ? 'mc-tab-active' : ''}`}
-            onClick={() => setTab('sell')}
+            onClick={() => { setTab('sell'); setTargetPrice(Math.round(price)); }}
           >
             Sell
           </button>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', fontSize: '0.85rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}>
+            <input type="checkbox" checked={orderType === 'limit'} onChange={e => setOrderType(e.target.checked ? 'limit' : 'market')} style={{ marginRight: '6px' }} />
+            Limit Order
+          </label>
         </div>
 
         <div className="mc-qty-row">
@@ -166,37 +176,51 @@ export default function MarketCard({ card, state, onBuy, onSell }: Props) {
           </div>
         </div>
 
+        {orderType === 'limit' && (
+          <div className="mc-qty-row">
+            <label className="mc-qty-label">Target $</label>
+            <input 
+              type="number" 
+              value={targetPrice} 
+              onChange={e => setTargetPrice(parseInt(e.target.value) || 0)} 
+              className="mc-qty-input" 
+              style={{ padding: '6px' }} 
+            />
+          </div>
+        )}
+
         {tab === 'buy' ? (
           <div className="mc-action">
             <div className="mc-cost-preview">
-              Cost: <strong>{formatCurrency(buyCost)}</strong>
-              {qty > 1 && <span> ({formatCurrency(Math.round(buyCost / qty))} avg)</span>}
+              {orderType === 'limit' ? `Total Allocation: ` : `Cost: `} 
+              <strong>{formatCurrency(orderType === 'limit' ? targetPrice * qty : buyCost)}</strong>
             </div>
             <button
               type="button"
               className="mc-execute-btn mc-buy-btn"
-              disabled={!canBuy}
-              onClick={() => onBuy(card.id, qty)}
+              disabled={orderType === 'limit' ? state.player.cash < (targetPrice * qty) : !canBuy}
+              onClick={() => orderType === 'limit' && onOrder ? onOrder(card.id, 'buy', targetPrice, qty) : onBuy(card.id, qty)}
               id={`buy-${card.id}`}
             >
-              Buy {qty}× {card.symbol}
+              {orderType === 'limit' ? 'Place Buy Order' : `Buy ${qty}× ${card.symbol}`}
             </button>
-            {!canBuy && <span className="mc-warn">Insufficient funds</span>}
+            {orderType !== 'limit' && !canBuy && <span className="mc-warn">Insufficient funds</span>}
+            {orderType === 'limit' && state.player.cash < (targetPrice * qty) && <span className="mc-warn">Insufficient funds for order</span>}
           </div>
         ) : (
           <div className="mc-action">
             <div className="mc-cost-preview">
-              Proceeds: <strong>{formatCurrency(sellProceeds)}</strong>
-              {qty > 1 && <span> ({formatCurrency(Math.round(sellProceeds / qty))} avg)</span>}
+              {orderType === 'limit' ? `Target Proceeds: ` : `Proceeds: `} 
+              <strong>{formatCurrency(orderType === 'limit' ? targetPrice * qty : sellProceeds)}</strong>
             </div>
             <button
               type="button"
               className="mc-execute-btn mc-sell-btn"
               disabled={!canSell}
-              onClick={() => onSell(card.id, qty)}
+              onClick={() => orderType === 'limit' && onOrder ? onOrder(card.id, 'sell', targetPrice, qty) : onSell(card.id, qty)}
               id={`sell-${card.id}`}
             >
-              Sell {qty}× {card.symbol}
+              {orderType === 'limit' ? 'Place Sell Order' : `Sell ${qty}× ${card.symbol}`}
             </button>
             {!canSell && <span className="mc-warn">Only {holding} held</span>}
           </div>

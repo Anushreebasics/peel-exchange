@@ -117,6 +117,41 @@ export async function claimDailyReward() {
   });
 }
 
+export async function buyRumor() {
+  return request<{ state: GameState }>('/api/game/rumor', {
+    method: 'POST',
+  });
+}
+
+export async function runAdCampaign(cardId: string) {
+  return request<{ state: GameState }>('/api/game/advertise', {
+    method: 'POST',
+    body: JSON.stringify({ cardId, quantity: 1 }),
+  });
+}
+
+export type Order = {
+  id: string;
+  userId: string;
+  cardId: string;
+  side: 'buy' | 'sell';
+  targetPrice: number;
+  quantity: number;
+  status: 'open' | 'filled' | 'cancelled';
+  createdAt: string;
+};
+
+export async function placeLimitOrder(cardId: string, side: 'buy'|'sell', targetPrice: number, quantity: number) {
+  return request<{ order: Order }>('/api/game/order', {
+    method: 'POST',
+    body: JSON.stringify({ cardId, side, targetPrice, quantity }),
+  });
+}
+
+export async function getOpenOrders() {
+  return request<{ orders: Order[] }>('/api/game/orders');
+}
+
 export async function advanceMarket() {
   return request<{ state: GameState }>('/api/game/advance', {
     method: 'POST',

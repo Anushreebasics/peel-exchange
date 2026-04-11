@@ -6,10 +6,12 @@ import {
   getMarketPrice,
   getHoldingCount,
 } from '../game';
+import { getOpenOrders, type Order } from '../lib/api';
 
 type Props = {
   state: GameState;
   onSell: (cardId: string, qty: number) => void;
+  onRunAdCampaign?: (cardId: string) => void;
 };
 
 function PnlBadge({ value }: { value: number }) {
@@ -21,8 +23,19 @@ function PnlBadge({ value }: { value: number }) {
   );
 }
 
-export default function Portfolio({ state, onSell }: Props) {
+export default function Portfolio({ state, onSell, onRunAdCampaign }: Props) {
   const [sellQty, setSellQty] = React.useState<Record<string, number>>({});
+  const [openOrders, setOpenOrders] = React.useState<Order[]>([]);
+
+  React.useEffect(() => {
+    let mounted = true;
+    getOpenOrders().then(res => {
+      if (mounted && res.orders) {
+        setOpenOrders(res.orders.filter(o => o.status === 'open'));
+      }
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, [state.market.tick]); // refetch when market advances
 
   const holdings = state.market.cards
     .map(card => {
@@ -144,6 +157,41 @@ export default function Portfolio({ state, onSell }: Props) {
                     Sell {cardSellQty}×
                   </button>
                 </div>
+
+                {/* Ad Campaign (if published by player) */}
+                {onRunAdCampaign && card.publishedByPlayer && (
+                  <div className="pf-hold-sell" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-strong)' }}>Boost Momentum</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Run ad campaign ($1000)</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="mc-execute-btn mc-buy-btn pf-sell-btn"
+                      onClick={() => onRunAdCampaign(card.id)}
+                      disabled={state.player.cash < 1000}
+                      style={{ width: 'auto', padding: '6px 12px' }}
+                    >
+                      Advertise
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Open Orders */}
+      {openOrders.length > 0 && (
+        <div className="pf-log" style={{ marginBottom: '24px' }}>
+          <p className="pf-log-title">Open Limit Orders</p>
+          {openOrders.map(o => {
+            const card = state.market.cards.find(c => c.id === o.cardId);
+            return (
+              <div key={o.id} className="pf-log-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>{o.side === 'buy' ? '🟢 Buy' : '🔴 Sell'} <strong>{o.quantity}× {card?.symbol}</strong></span>
+                <span>Limit at {formatCurrency(o.targetPrice)}</span>
               </div>
             );
           })}

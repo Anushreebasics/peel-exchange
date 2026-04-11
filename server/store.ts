@@ -1,14 +1,16 @@
 import { randomUUID } from 'crypto';
-import { mkdir, readFile, writeFile } from 'fs/promises';
 import path from 'path';
+import { prisma } from './prisma.js';
 import {
   advanceMarket,
   buyCard,
+  buyRumor,
   claimDailyReward,
   createInitialState,
   getMarketPrice,
   getNetWorth,
   publishCard,
+  runAdCampaign,
   sellCard,
   getBuyCost,
   getSellProceeds,
@@ -357,17 +359,214 @@ function ensureStoreShape(store: Store): Store {
 
 export async function loadStore(): Promise<Store> {
   try {
-    const raw = await readFile(STORE_PATH, 'utf8');
-    const parsed = JSON.parse(raw) as Store;
-    return ensureStoreShape(parsed);
-  } catch {
+    const users = await prisma.user.findMany({
+      include: { trades: true, holdings: true }
+    });
+    
+    if (users.length === 0) {
+      const seed = createSeedStore();
+      await saveStore(seed);
+      return seed;
+    }
+
+    const cards = await prisma.card.findMany();
+    const globalState = await prisma.globalState.findUnique({ where: { id: 1 } });
+    const events = await prisma.marketEvent.findMany({ orderBy: { createdAt: 'desc' }, take: 10 });
+    const circuitBreakers = await prisma.circuitBreaker.findMany();
+    const anomalyFlags = await prisma.anomalyFlag.findMany();
+
+    const store: Store = {
+      users: users.map(u => ({
+        id: u.id,
+        email: u.email,
+        passwordHash: u.passwordHash,
+        displayName: u.displayName,
+        createdAt: u.createdAt.toISOString(),
+        lastLoginAt: u.lastLoginAt ? u.lastLoginAt.toISOString() : null,
+      })),
+      profiles: {},
+      market: {
+        day: globalState?.day ?? 1,
+        tick: globalState?.tick ?? 0,
+        leaderboard: [],
+        news: JSON.parse(globalState?.news ?? "[]"),
+        cards: cards.map(c => ({
+          ...c,
+          publisherId: c.publisherId ?? undefined,
+          supplyMode: c.supplyMode as any,
+          priceHistory: JSON.parse(c.priceHistory || "[]"),
+        }))
+      },
+      events: events.map(e => ({
+        ...e,
+        cardSymbol: e.cardSymbol ?? undefined,
+        mood: e.mood as any,
+        createdAt: e.createdAt.toISOString(),
+      })),
+      circuitBreakers: circuitBreakers.reduce((acc, cb) => {
+        acc[cb.cardId] = {
+          ...cb,
+          brokenAt: cb.brokenAt.toISOString(),
+          recoversAt: cb.recoversAt.toISOString(),
+        };
+        return acc;
+      }, {} as Record<string, CircuitBreakerState>),
+      anomalyFlags: anomalyFlags.reduce((acc, af) => {
+        acc[`${af.userId}:${af.cardId}`] = {
+          ...af,
+          riskLevel: af.riskLevel as any,
+        };
+        return acc;
+      }, {} as Record<string, AnomalyFlags>),
+    };
+
+    for (const u of users) {
+      const holdings: Record<string, number> = {};
+      const avgCost: Record<string, number> = {};
+      for (const h of u.holdings) {
+        holdings[h.cardId] = h.qty;
+        avgCost[h.cardId] = h.avgCost;
+      }
+      store.profiles[u.id] = {
+        player: {
+          cash: u.cash,
+          xp: u.xp,
+          level: u.level,
+          creatorWallet: u.creatorWallet,
+          loginStreak: u.loginStreak,
+          holdings,
+          avgCost,
+          lastTickAt: u.lastTickAt.getTime(),
+          lastLoginDate: u.lastLoginDate,
+          lastDailyRewardAt: u.lastDailyRewardAt ? u.lastDailyRewardAt.getTime() : null,
+          rumors: JSON.parse(u.rumors || "[]"),
+        },
+        log: [], 
+        trades: u.trades.map(t => ({
+          ...t,
+          executedAt: t.executedAt.toISOString(),
+          side: t.side as 'buy'|'sell',
+        })).sort((a,b) => new Date(b.executedAt).getTime() - new Date(a.executedAt).getTime()),
+      };
+    }
+
+    return ensureStoreShape(store);
+  } catch (e) {
+    console.error("Prisma load error:", e);
     return createSeedStore();
   }
 }
 
 export async function saveStore(store: Store) {
-  await mkdir(path.dirname(STORE_PATH), { recursive: true });
-  await writeFile(STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
+  // Sync Users and Profiles
+  for (const user of store.users) {
+    const profile = store.profiles[user.id];
+    if (!profile) continue;
+    
+    await prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : null,
+        cash: profile.player.cash,
+        xp: profile.player.xp,
+        level: profile.player.level,
+        creatorWallet: profile.player.creatorWallet,
+        loginStreak: profile.player.loginStreak,
+        lastTickAt: new Date(profile.player.lastTickAt),
+        lastLoginDate: profile.player.lastLoginDate,
+        lastDailyRewardAt: profile.player.lastDailyRewardAt ? new Date(profile.player.lastDailyRewardAt) : null,
+        rumors: JSON.stringify(profile.player.rumors ?? []),
+      },
+      create: {
+        id: user.id,
+        email: user.email,
+        passwordHash: user.passwordHash,
+        displayName: user.displayName,
+        createdAt: new Date(user.createdAt),
+        lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : null,
+        cash: profile.player.cash,
+        xp: profile.player.xp,
+        level: profile.player.level,
+        creatorWallet: profile.player.creatorWallet,
+        loginStreak: profile.player.loginStreak,
+        lastTickAt: new Date(profile.player.lastTickAt),
+        lastLoginDate: profile.player.lastLoginDate,
+        lastDailyRewardAt: profile.player.lastDailyRewardAt ? new Date(profile.player.lastDailyRewardAt) : null,
+        rumors: JSON.stringify(profile.player.rumors ?? []),
+      }
+    });
+
+    for (const [cardId, qty] of Object.entries(profile.player.holdings)) {
+      if (qty > 0) {
+        await prisma.holding.upsert({
+          where: { userId_cardId: { userId: user.id, cardId } },
+          update: { qty, avgCost: profile.player.avgCost[cardId] ?? 0 },
+          create: { userId: user.id, cardId, qty, avgCost: profile.player.avgCost[cardId] ?? 0 },
+        });
+      } else {
+        await prisma.holding.deleteMany({ where: { userId: user.id, cardId } });
+      }
+    }
+
+    for (const trade of profile.trades) {
+      await prisma.trade.upsert({
+        where: { id: trade.id },
+        update: {},
+        create: {
+          id: trade.id,
+          userId: trade.userId,
+          cardId: trade.cardId,
+          cardSymbol: trade.cardSymbol,
+          side: trade.side,
+          quantity: trade.quantity,
+          pricePerUnit: trade.pricePerUnit,
+          feePaid: trade.feePaid,
+          slippagePaid: trade.slippagePaid,
+          totalValue: trade.totalValue,
+          pnl: trade.pnl,
+          executedAt: new Date(trade.executedAt),
+          marketTick: trade.marketTick,
+        }
+      });
+    }
+  }
+
+  // Sync Cards
+  for (const card of store.market.cards) {
+    await prisma.card.upsert({
+      where: { id: card.id },
+      update: {
+        basePrice: card.basePrice,
+        demandBias: card.demandBias,
+        owned: card.owned,
+        momentum: card.momentum,
+        priceHistory: JSON.stringify(card.priceHistory ?? []),
+      },
+      create: {
+        id: card.id,
+        name: card.name,
+        symbol: card.symbol,
+        category: card.category,
+        basePrice: card.basePrice,
+        volatility: card.volatility,
+        demandBias: card.demandBias,
+        creatorShare: card.creatorShare,
+        supplyMode: card.supplyMode,
+        supply: card.supply,
+        owned: card.owned,
+        momentum: card.momentum,
+        priceHistory: JSON.stringify(card.priceHistory ?? []),
+        publishedByPlayer: card.publishedByPlayer ?? false,
+        publisherId: card.publisherId,
+      }
+    });
+  }
+
+  await prisma.globalState.upsert({
+    where: { id: 1 },
+    update: { day: store.market.day, tick: store.market.tick, news: JSON.stringify(store.market.news ?? []) },
+    create: { id: 1, day: store.market.day, tick: store.market.tick, news: JSON.stringify(store.market.news ?? []) },
+  });
 }
 
 // ── User CRUD ──────────────────────────────────────────────────────────────
@@ -764,6 +963,59 @@ export function claimRewardForUser(store: Store, userId: string) {
       rewardAmount: nextState.player.cash - before.player.cash,
       streak: nextState.player.loginStreak,
     },
+  });
+  
+  return { state: buildState(store, userId) };
+}
+
+export function buyRumorForUser(store: Store, userId: string) {
+  const before = buildState(store, userId);
+  
+  if (before.player.cash < 500) {
+    logAudit({
+      userId,
+      action: 'trade_rejected',
+      reason: 'INSUFFICIENT_CASH',
+      details: { message: 'Not enough cash for rumor' },
+    });
+    return null;
+  }
+  
+  const nextState = buyRumor(before);
+  if (nextState === before) return null;
+  persistProfileState(store, userId, nextState);
+  
+  logAudit({
+    userId,
+    action: 'buy_rumor' as any,
+    details: { cost: 500 },
+  });
+  
+  return { state: buildState(store, userId) };
+}
+
+export function runAdCampaignForUser(store: Store, userId: string, cardId: string) {
+  const before = buildState(store, userId);
+  
+  if (before.player.cash < 1000) {
+    logAudit({
+      userId,
+      action: 'trade_rejected',
+      reason: 'INSUFFICIENT_CASH',
+      details: { message: 'Not enough cash for ad campaign' },
+    });
+    return null;
+  }
+  
+  const nextState = runAdCampaign(before, cardId);
+  if (nextState === before) return null;
+  persistProfileState(store, userId, nextState);
+  
+  logAudit({
+    userId,
+    action: 'ad_campaign' as any,
+    cardId,
+    details: { cost: 1000 },
   });
   
   return { state: buildState(store, userId) };
