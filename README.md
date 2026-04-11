@@ -1,75 +1,105 @@
-# Peel Exchange (Banana Trading Company)
+# 🍌 Peel Exchange: Institutional-Grade Trading Simulator
 
-Banana Trading Company is an institutional-grade trading simulator built with a React + TypeScript frontend and a Prisma-backed Express backend. 
+> **A living, breathing exchange engine built for speed, transparency, and high-frequency chaos.**
 
-Players trade dynamic assets over a simulated market, manage risk, grow net worth, and unlock card publishing with creator royalties. The entire architecture runs over a real-time low-latency WebSocket connection, bridging the core trading UI directly with a synthetic limit order book.
+Peel Exchange (formerly Banana Trading Company) is a full-stack trading simulator that transforms a simple market prototype into a sophisticated financial engine. It combines real-time WebSockets, autonomous AI bots, and a custom-built limit order book to create a marketplace that never sleeps.
 
-## Highlights & Advanced Mechanics
-- **Robust Relational Data**: Swapped legacy JSON flat files for a transaction-safe **Prisma + SQLite** schema architecture tracking deep trade histories, portfolio positions, and security audits.
-- **The Information Economy**: Buy and sell insider rumors or run massive ad campaigns to artificially blast your card's demand bias into the stratosphere.
-- **Live WebSocket Streams**: Say goodbye to tedious REST polling. `Socket.io` hooks the backend AMM ticks natively to your frontend React store for synchronous global price action.
-- **Headless AI Market Makers**: You are not alone. The background server simultaneously runs "Momentum Algos", "Whales", and "Retail Swarms" that execute pure trades against the Prisma engine, resulting in continuous organic lifecycle behavior and explosive volume spikes.
-- **Limit Order Engineering**: Utilize the advanced control panel within Market Cards to define specific Bid/Ask **Limit Orders**. The proprietary matching pipeline will cache your query and instantly fill it off the backend ledger if overlap is detected.
-- **Creator Studio**: Publish custom cards after reaching the net worth threshold and reap liquidity provider fees forever.
+---
 
-## Backend Safety Features
-The persistence engine natively throttles unfair market movements:
-- Strict ORM input constraint validation via `zod`.
-- Transactional integrity to prevent race conditions during rapid buy/sells.
-- Detailed Audit extraction algorithms for flagging network abuse.
-- Circuit Breakers: Auto-halt trading on underlying assets suffering from extreme unpredicted volatility limits.
+## 🏗️ The Project Evolution
+This project underwent a massive 4-phase backend modernization to move beyond standard CRUD patterns:
+1.  **Persistence Overhaul:** Migrated from volatile JSON file storage to a relational **Prisma + SQLite** database with transaction safety.
+2.  **Real-Time Core:** Implemented **Socket.io** to remove REST polling, enabling sub-100ms market updates across all connected clients.
+3.  **Liquidity Provision:** Designed a **Heartbeat Engine** for autonomous AI bots (Whales, Algos) that trade against the user in real-time.
+4.  **Matching Engine:** Developed an asynchronous **Limit Order Book** that evaluates and fills trades based on price-time priority.
 
-## Tech Stack
-- **Frontend**: React 19, TypeScript, Vite, Socket.io-client
-- **Backend**: Node.js, Express, TypeScript, Socket.io, JWT auth
-- **Database**: Prisma ORM, SQLite (`dev.db`)
+---
 
-## Project Structure
-- `src/`: Client-side React interface and unified `game.ts` formulas.
-- `server/`: Application routing, WebSockets, and bots (`bots.ts`, `matching.ts`).
-- `prisma/`: Relational schema declarations and configuration mapping.
-- `public/`: Static bundled asset references.
+## ✨ Core Features
 
-## Getting Started
+### 🎮 The Gameplay
+- **The Information Economy:** Don't just trade on charts. Buy **Rumors** to predict market events or pay for **Ad Campaigns** to pump the momentum of your own holdings.
+- **Creator Studio:** Break through the $5,000 net worth threshold to publish your own custom cards, define their supply/volatility, and earn royalties on every subsequent trade.
+- **Progression Loop:** Experience level-up mechanics, daily rewards, and global leaderboard rankings.
 
-### 1) Install
+### ⚙️ The Engineering
+- **Autonomous AI Market Makers:** Three distinct bot archetypes (Momentum, Whale, Retail) keep the market volatile even when you're offline.
+- **Limit Order Matching:** Place targets for entries and exits; our background engine fills your orders the moment the AMM price hits your trigger.
+- **Institutional Guardrails:** Real-time **Anomaly Detection** flags wash-trading, while **Circuit Breakers** automatically halt assets with extreme price spikes.
+
+---
+
+## 🛠️ Architecture Overview
+
+```mermaid
+graph TD
+    User((Trader)) -->|WebSockets| WS[Socket.io Server]
+    User -->|REST API| API[Express API]
+    
+    API -->|Prisma| DB[(SQLite Database)]
+    
+    subgraph Backend Engine
+        Bots[AI Bot Heartbeat] -->|Trades| Match[Matching Engine]
+        Match -->|Fills| DB
+        Global[Market Tick Loop] -->|Price Physics| DB
+    end
+    
+    DB -->|Broadcast| WS
+    WS -->|Live Updates| User
+```
+
+---
+
+## 🚀 Tech Stack
+
+| Layer | Responsibility | Technology |
+| :--- | :--- | :--- |
+| **Frontend** | Reactive UI & Sparklines | React 19, Vite, TypeScript |
+| **Real-time** | Low-latency state sync | Socket.io |
+| **Backend** | API & Auth & Bot AI | Node.js, Express, tsx |
+| **Database** | Relational Ledger & Audit | Prisma ORM, SQLite |
+| **Security** | Input & Auth | Zod, JWT, Bcrypt |
+
+---
+
+## 🏁 Getting Started
+
+### 1. Prerequisites
+- Node.js (v18+)
+- npm
+
+### 2. Installation
 ```bash
+git clone https://github.com/Anushreebasics/peel-exchange.git
+cd peel-exchange
 npm install
 ```
 
-### 2) Database Setup
-Ensure your Prisma schema is cleanly pushed to SQLite:
+### 3. Database Sync
+Peel Exchange uses Prisma to manage its relational schema.
 ```bash
 npx prisma db push
 npx prisma generate
 ```
 
-### 3) Run Environment
+### 4. Running the Exchange
+Start the frontend and backend concurrently in watch mode:
 ```bash
 npm run dev
 ```
+- **Trade Floor:** [http://localhost:5173](http://localhost:5173)
+- **API Server:** [http://localhost:3001](http://localhost:3001)
 
-This starts:
-- Frontend (Vite): http://localhost:5173
-- Backend (Express): http://localhost:3001
-- WebSockets: Binds successfully to PORT 3001
+---
 
-## Available Scripts
+## 📡 API Endpoints
 
-- `npm run dev`: Boot frontend and backend concurrently in watch mode.
-- `npm run build`: Type-checks and creates a unified frontend production bundle under `/dist`.
-- `npm run build:server`: Isolated backend compilation.
-- `npm run lint`: Run global ESLint configs.
-- `npm run preview`: Serve the compiled `index.html` static site builder.
+-   **Authentication:** `/api/auth/signup`, `/api/auth/login`
+-   **Core Trading:** `/api/game/buy`, `/api/game/sell`, `/api/game/order` (Limit Orders)
+-   **Insider Info:** `/api/game/rumor`, `/api/game/advertise`
+-   **Admin/Debug:** `/api/debug/audit`, `/api/debug/anomalies`, `/api/debug/circuit-breakers`
 
-## API Overview
+---
 
-Main API routes are under `/api`:
-
-- **Auth**: `/api/auth/signup`, `/api/auth/login`, `/api/auth/me`
-- **Exchange**: `/api/game/state`, `/api/game/buy`, `/api/game/sell`, `/api/game/order`
-- **Information**: `/api/game/rumor`, `/api/game/advertise`, `/api/game/publish`
-- **Progress**: `/api/game/reward/daily`, `/api/game/leaderboard`, `/api/game/summary`
-- **Utility**: `/api/game/news`, `/api/game/trades`, `/api/game/portfolio`, `/api/game/orders`
-
-*(Note: In production mode, the Express server gracefully serves React routes via `app.use(express.static('dist'))` fallback).*
+## 📝 License
+This project is open-source under the MIT License. Built with 🍌.
