@@ -1,4 +1,4 @@
-# 🏦 Yellow Ledger: Institutional-Grade Trading Simulator
+# 🏦 Yellow Ledger
 
 > **A living, breathing exchange engine built for speed, transparency, and high-frequency chaos.**
 
