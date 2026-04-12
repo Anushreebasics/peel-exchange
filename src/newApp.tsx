@@ -54,7 +54,7 @@ const pages: Array<{ id: PageId; label: string; icon: string }> = [
   { id: 'news',        label: 'News',        icon: '📰' },
 ];
 
-const onboardingStorageKey = 'banana-trading-company-onboarding-v1';
+const onboardingStorageKey = 'yellow-ledger-onboarding-v1';
 
 let toastCounter = 0;
 
@@ -93,8 +93,8 @@ function AuthModal({
         <button className="modal-close" type="button" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="modal-header">
-          <span className="modal-banana">🍌</span>
-          <h2 className="modal-title">Peel Exchange</h2>
+          <span className="modal-banana">🏦</span>
+          <h2 className="modal-title">Yellow Ledger</h2>
           <p className="modal-sub">Sign in to save your progress and appear on the leaderboard</p>
         </div>
 
@@ -315,7 +315,7 @@ function App() {
     volatility: number; creatorShare: number; supplyMode: SupplyMode; supply: number;
   }) => {
     await mutate(() => publishCard(state, payload), () => apiPublishCard(payload));
-    addToast(`${payload.symbol} launched on the Peel Exchange! 🚀`, 'publish');
+    addToast(`${payload.symbol} launched on Yellow Ledger! 🚀`, 'publish');
   };
 
   const handleAdvanceMarket = async () => {
@@ -351,10 +351,10 @@ function App() {
       {/* ── SIDEBAR ─────────────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span className="sidebar-logo">🍌</span>
+          <span className="sidebar-logo">🏦</span>
           <div>
-            <p className="sidebar-title">Peel Exchange</p>
-            <p className="sidebar-sub">Banana Trading Co.</p>
+            <p className="sidebar-title">Yellow Ledger</p>
+            <p className="sidebar-sub">Yellow Ledger</p>
           </div>
         </div>
 

@@ -37,7 +37,7 @@ export default function CreatorStudio({ state, onPublish }: Props) {
   const [creatorShare, setCreatorShare] = React.useState(0.1);
   const [supplyMode, setSupplyMode] = React.useState<SupplyMode>('limited');
   const [supply, setSupply] = React.useState(500);
-  const [seed, setSeed] = React.useState('banana alpha');
+  const [seed, setSeed] = React.useState('wealth alpha');
 
   const draft = buildCardDraftFromSeed(seed);
   const displayName = name || draft.name;
@@ -90,7 +90,7 @@ export default function CreatorStudio({ state, onPublish }: Props) {
           <div className="cs-field-row">
             <label className="cs-label">
               Seed phrase
-              <input value={seed} onChange={e => setSeed(e.target.value)} placeholder="banana alpha" className="cs-input" />
+              <input value={seed} onChange={e => setSeed(e.target.value)} placeholder="wealth alpha" className="cs-input" />
               <small>Determines auto-generated defaults — or override below</small>
             </label>
           </div>
@@ -172,7 +172,7 @@ export default function CreatorStudio({ state, onPublish }: Props) {
             disabled={!unlocked}
             id="creator-publish-btn"
           >
-            {unlocked ? `🚀 Publish ${displaySymbol} to the Peel Exchange` : '🔒 Unlock at $5,000 net worth'}
+            {unlocked ? `🚀 Publish ${displaySymbol} to Yellow Ledger` : '🔒 Unlock at $5,000 net worth'}
           </button>
         </form>
 

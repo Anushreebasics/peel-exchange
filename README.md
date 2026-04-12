@@ -1,8 +1,8 @@
-# 🍌 Peel Exchange: Institutional-Grade Trading Simulator
+# 🏦 Yellow Ledger: Institutional-Grade Trading Simulator
 
 > **A living, breathing exchange engine built for speed, transparency, and high-frequency chaos.**
 
-Peel Exchange (formerly Banana Trading Company) is a full-stack trading simulator that transforms a simple market prototype into a sophisticated financial engine. It combines real-time WebSockets, autonomous AI bots, and a custom-built limit order book to create a marketplace that never sleeps.
+Yellow Ledger is a full-stack trading simulator that transforms a simple market prototype into a sophisticated financial engine. It combines real-time WebSockets, autonomous AI bots, and a custom-built limit order book to create a marketplace that never sleeps.
 
 ---
 
@@ -76,7 +76,7 @@ npm install
 ```
 
 ### 3. Database Sync
-Peel Exchange uses Prisma to manage its relational schema.
+Yellow Ledger uses Prisma to manage its relational schema.
 ```bash
 npx prisma db push
 npx prisma generate
@@ -89,6 +89,7 @@ npm run dev
 ```
 - **Trade Floor:** [http://localhost:5173](http://localhost:5173)
 - **API Server:** [http://localhost:3001](http://localhost:3001)
+- **WebSockets:** Binds successfully to PORT 3001](http://localhost:3001)
 
 ---
 

@@ -319,11 +319,11 @@ function createSeedStore(): Store {
     market: { ...seed.market, leaderboard: [], cards: ensureCards(seed.market.cards) },
     events: [
       {
-        id: 'banana-shortage',
-        title: 'Banana shortage',
+        id: 'liquidity-shortage',
+        title: 'Market Liquidity Crunch',
         body: 'All prices surge as supply tightens across the exchange.',
         mood: 'positive',
-        impact: '+10% market-wide',
+        impact: 'Asset shortage +12%',
         createdAt: new Date().toISOString(),
       },
       {

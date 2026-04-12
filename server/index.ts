@@ -417,7 +417,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const server = app.listen(PORT, async () => {
-  console.log(`Banana Trading Company API listening on http://localhost:${PORT}`);
+  console.log(`Yellow Ledger API listening on http://localhost:${PORT}`);
   await bootstrapBots(store, commitStore);
   console.log('🤖 AI Market Makers booted and lurking.');
 });

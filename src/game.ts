@@ -64,7 +64,7 @@ export type GameState = {
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const STORAGE_KEY = 'banana-trading-company-save-v2';
+const STORAGE_KEY = 'yellow-ledger-save-v1';
 const DAILY_REWARD_MS = 24 * 60 * 60 * 1000;
 const PRICE_FLOOR_FACTOR = 0.4;
 const PRICE_CAP_FACTOR = 4;
@@ -213,7 +213,7 @@ export function createInitialState(): GameState {
   const cards: CardDefinition[] = [
     {
       id: 'btcn',
-      name: 'Banana Treasury Chain',
+      name: 'Sovereign Treasury Chain',
       symbol: 'BTCN',
       category: 'Infrastructure',
       basePrice: 120,
@@ -228,7 +228,7 @@ export function createInitialState(): GameState {
     },
     {
       id: 'ape',
-      name: 'Ape Arcade Media',
+      name: 'Volt Arcade Media',
       symbol: 'APE',
       category: 'Entertainment',
       basePrice: 85,
@@ -258,7 +258,7 @@ export function createInitialState(): GameState {
     },
     {
       id: 'dpp',
-      name: 'Daily Peel Press',
+      name: 'Daily Ledger Press',
       symbol: 'DPP',
       category: 'Publishing',
       basePrice: 45,
@@ -288,7 +288,7 @@ export function createInitialState(): GameState {
     },
     {
       id: 'mnk',
-      name: 'Monkey Market Fund',
+      name: 'Apex Market Fund',
       symbol: 'MNK',
       category: 'Finance',
       basePrice: 320,
@@ -324,7 +324,7 @@ export function createInitialState(): GameState {
       news: [
         {
           id: 'headline-1',
-          title: 'Banana futures open strong',
+          title: 'Asset futures open strong',
           body: 'Demand is flowing into early-growth cards as new players enter the exchange. Analysts expect volatility through the first week.',
           mood: 'positive',
           impact: '+8% crowd interest',
@@ -345,7 +345,7 @@ export function createInitialState(): GameState {
         { name: 'You', netWorth: 1500, streak: 1 },
       ],
     },
-    log: ['Welcome to Banana Trading Company. Buy low, sell high, and publish your own cards when you break through.'],
+    log: ['Welcome to Yellow Ledger. Buy low, sell high, and publish your own cards when you break through.'],
   };
 }
 
@@ -537,7 +537,7 @@ export function publishCard(state: GameState, cardDraft: {
       cards: [card, ...state.market.cards],
       news: [launchHeadline, ...state.market.news].slice(0, 10),
     },
-    log: [`Published ${card.name} on the Peel Exchange!`].concat(state.log).slice(0, 12),
+    log: [`Published ${card.name} on Yellow Ledger!`].concat(state.log).slice(0, 12),
   };
 }
 
@@ -639,10 +639,9 @@ export function runAdCampaign(state: GameState, cardId: string): GameState {
 
 // ── Market Tick ────────────────────────────────────────────────────────────
 const eventTemplates = [
-  { title: 'Banana shortage hits the exchange', body: 'Supply constraints push prices up across limited-supply cards.', mood: 'positive' as const, momentumRange: [0.12, 0.22] },
-  { title: 'Whale liquidation alert', body: 'Large sell orders flood the market, triggering a price correction.', mood: 'negative' as const, momentumRange: [-0.20, -0.10] },
-  { title: 'Peel Protocol upgrade announced', body: 'Governance vote passes — infrastructure cards rally.', mood: 'positive' as const, momentumRange: [0.08, 0.18] },
-  { title: 'Monkey Media acquires DPP stake', body: 'Publishing card spikes on merger speculation.', mood: 'positive' as const, momentumRange: [0.10, 0.20] },
+  { title: 'Market shortage hits the exchange', body: 'Supply constraints push prices up across limited-supply cards.', mood: 'positive' as const, momentumRange: [0.12, 0.22] },
+  { title: 'Ledger Protocol upgrade announced', body: 'Governance vote passes — infrastructure cards rally.', mood: 'positive' as const, momentumRange: [0.08, 0.18] },
+  { title: 'Prime Media acquires DPP stake', body: 'Publishing card spikes on merger speculation.', mood: 'positive' as const, momentumRange: [0.10, 0.20] },
   { title: 'Regulatory uncertainty clouds the market', body: 'Traders pull back from high-volatility positions.', mood: 'negative' as const, momentumRange: [-0.15, -0.06] },
   { title: 'Creator royalties reach record highs', body: 'Player-issued cards generate outsized returns for creators this week.', mood: 'positive' as const, momentumRange: [0.05, 0.15] },
   { title: 'Flash crash in supply-chain cards', body: 'GRO tumbles briefly before buy orders stabilize the floor.', mood: 'negative' as const, momentumRange: [-0.18, -0.08] },
@@ -650,7 +649,7 @@ const eventTemplates = [
 ];
 
 const routineTemplates: NewsItem[] = [
-  { id: '', title: 'Liquidity thickens on the Peel Exchange', body: 'Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.', mood: 'positive', impact: 'lower fees for limit orders' },
+  { id: '', title: 'Liquidity thickens on Yellow Ledger', body: 'Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.', mood: 'positive', impact: 'lower fees for limit orders' },
   { id: '', title: 'Momentum indicators flash mixed signals', body: 'Short-term trend followers are cautious as oscillators reach neutral zones.', mood: 'neutral', impact: 'watch volatility' },
   { id: '', title: 'Creator wallets distributed on schedule', body: 'Royalty streams credited to all active card publishers. Passive income is the new alpha.', mood: 'positive', impact: 'royalties credited' },
   { id: '', title: 'Scarcity premium builds in limited cards', body: 'As mint counts approach supply caps, early holders are sitting on significant unrealized gains.', mood: 'positive', impact: 'limited supply premium +8%' },
@@ -757,7 +756,7 @@ export function advanceMarket(state: GameState): GameState {
 }
 
 // ── Creator Draft Builder ──────────────────────────────────────────────────
-const draftNames = ['Bananex', 'PeelCoin', 'Monkey Media', 'Golden Grove', 'Slipstream', 'Cargo Citrus', 'Tropicana', 'Sundowner'];
+const draftNames = ['LedgerX', 'GoldCoin', 'Cipher Media', 'Golden Grove', 'Slipstream', 'Cargo Citrus', 'Tropicana', 'Sundowner'];
 const draftCategories = ['Culture', 'Energy', 'AI', 'Logistics', 'Media', 'Finance', 'Gaming', 'Health'];
 
 export function buildCardDraftFromSeed(seed: string) {

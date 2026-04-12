@@ -24,7 +24,7 @@
         "lastLoginDate": null
       },
       "log": [
-        "Welcome to Banana Trading Company. Buy low, sell high, and publish your own cards when you break through."
+        "Welcome to Yellow Ledger. Buy low, sell high, and publish your own cards when you break through."
       ],
       "trades": []
     }
@@ -178,7 +178,7 @@
       },
       {
         "id": "n-1360",
-        "title": "Liquidity thickens on the Peel Exchange",
+        "title": "Liquidity thickens on the Yellow Ledger",
         "body": "Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.",
         "mood": "positive",
         "impact": "lower fees for limit orders"
@@ -213,7 +213,7 @@
       },
       {
         "id": "n-1355",
-        "title": "Liquidity thickens on the Peel Exchange",
+        "title": "Liquidity thickens on the Yellow Ledger",
         "body": "Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.",
         "mood": "positive",
         "impact": "lower fees for limit orders"

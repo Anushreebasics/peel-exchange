@@ -9,9 +9,9 @@ import {
 
 export async function bootstrapBots(store: Store, commitCallback: () => Promise<void>) {
   const botProfiles = [
-    { email: 'bot_momentum@banana.com', name: 'Momentum Algo' },
-    { email: 'bot_whale@banana.com', name: 'Whale Entity' },
-    { email: 'bot_retail@banana.com', name: 'Retail Swarm' }
+    { email: 'bot_momentum@ledger.io', name: 'Momentum Algo' },
+    { email: 'bot_whale@ledger.io', name: 'Whale Entity' },
+    { email: 'bot_retail@ledger.io', name: 'Retail Swarm' }
   ];
 
   const bots: string[] = [];
