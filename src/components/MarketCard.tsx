@@ -134,12 +134,23 @@ export default function MarketCard({ card, state, onBuy, onSell, onOrder }: Prop
       )}
 
       {/* Trade controls */}
-      <div className="mc-trade">
+      <div className="mc-trade" style={{ position: 'relative' }}>
+        {card.isHalted && (
+          <div className="mc-halted-overlay">
+            <div className="mc-halted-content">
+              <span className="mc-halted-icon">⚠️</span>
+              <span className="mc-halted-title">TRADING HALTED</span>
+              <p className="mc-halted-text">Automatic circuit breaker triggered due to extreme volatility.</p>
+            </div>
+          </div>
+        )}
+        
         <div className="mc-tabs">
           <button
             type="button"
             className={`mc-tab ${tab === 'buy' ? 'mc-tab-active' : ''}`}
             onClick={() => { setTab('buy'); setTargetPrice(Math.round(price)); }}
+            disabled={card.isHalted}
           >
             Buy
           </button>
@@ -147,82 +158,91 @@ export default function MarketCard({ card, state, onBuy, onSell, onOrder }: Prop
             type="button"
             className={`mc-tab ${tab === 'sell' ? 'mc-tab-active' : ''}`}
             onClick={() => { setTab('sell'); setTargetPrice(Math.round(price)); }}
+            disabled={card.isHalted}
           >
             Sell
           </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', fontSize: '0.85rem' }}>
-          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}>
-            <input type="checkbox" checked={orderType === 'limit'} onChange={e => setOrderType(e.target.checked ? 'limit' : 'market')} style={{ marginRight: '6px' }} />
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', fontSize: '0.85rem', opacity: card.isHalted ? 0.5 : 1 }}>
+          <label style={{ display: 'flex', alignItems: 'center', cursor: card.isHalted ? 'not-allowed' : 'pointer', color: 'var(--text-muted)' }}>
+            <input 
+              type="checkbox" 
+              checked={orderType === 'limit'} 
+              onChange={e => !card.isHalted && setOrderType(e.target.checked ? 'limit' : 'market')} 
+              style={{ marginRight: '6px' }} 
+              disabled={card.isHalted}
+            />
             Limit Order
           </label>
         </div>
 
-        <div className="mc-qty-row">
+        <div className="mc-qty-row" style={{ opacity: card.isHalted ? 0.5 : 1 }}>
           <label className="mc-qty-label" htmlFor={`qty-${card.id}`}>Qty</label>
           <div className="mc-qty-controls">
-            <button type="button" className="mc-qty-btn" onClick={() => setQty(q => Math.max(1, q - 1))}>−</button>
+            <button type="button" className="mc-qty-btn" onClick={() => !card.isHalted && setQty(q => Math.max(1, q - 1))} disabled={card.isHalted}>−</button>
             <input
               id={`qty-${card.id}`}
               type="number"
               min={1}
               max={100}
               value={qty}
-              onChange={e => setQty(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
+              onChange={e => !card.isHalted && setQty(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
               className="mc-qty-input"
+              disabled={card.isHalted}
             />
-            <button type="button" className="mc-qty-btn" onClick={() => setQty(q => Math.min(100, q + 1))}>+</button>
+            <button type="button" className="mc-qty-btn" onClick={() => !card.isHalted && setQty(q => Math.min(100, q + 1))} disabled={card.isHalted}>+</button>
           </div>
         </div>
 
         {orderType === 'limit' && (
-          <div className="mc-qty-row">
+          <div className="mc-qty-row" style={{ opacity: card.isHalted ? 0.5 : 1 }}>
             <label className="mc-qty-label">Target $</label>
             <input 
               type="number" 
               value={targetPrice} 
-              onChange={e => setTargetPrice(parseInt(e.target.value) || 0)} 
+              onChange={e => !card.isHalted && setTargetPrice(parseInt(e.target.value) || 0)} 
               className="mc-qty-input" 
               style={{ padding: '6px' }} 
+              disabled={card.isHalted}
             />
           </div>
         )}
 
         {tab === 'buy' ? (
           <div className="mc-action">
-            <div className="mc-cost-preview">
+            <div className="mc-cost-preview" style={{ opacity: card.isHalted ? 0.5 : 1 }}>
               {orderType === 'limit' ? `Total Allocation: ` : `Cost: `} 
               <strong>{formatCurrency(orderType === 'limit' ? targetPrice * qty : buyCost)}</strong>
             </div>
             <button
               type="button"
               className="mc-execute-btn mc-buy-btn"
-              disabled={orderType === 'limit' ? state.player.cash < (targetPrice * qty) : !canBuy}
+              disabled={card.isHalted || (orderType === 'limit' ? state.player.cash < (targetPrice * qty) : !canBuy)}
               onClick={() => orderType === 'limit' && onOrder ? onOrder(card.id, 'buy', targetPrice, qty) : onBuy(card.id, qty)}
               id={`buy-${card.id}`}
             >
-              {orderType === 'limit' ? 'Place Buy Order' : `Buy ${qty}× ${card.symbol}`}
+              {card.isHalted ? 'TRADING HALTED' : (orderType === 'limit' ? 'Place Buy Order' : `Buy ${qty}× ${card.symbol}`)}
             </button>
-            {orderType !== 'limit' && !canBuy && <span className="mc-warn">Insufficient funds</span>}
-            {orderType === 'limit' && state.player.cash < (targetPrice * qty) && <span className="mc-warn">Insufficient funds for order</span>}
+            {orderType !== 'limit' && !canBuy && !card.isHalted && <span className="mc-warn">Insufficient funds</span>}
+            {orderType === 'limit' && state.player.cash < (targetPrice * qty) && !card.isHalted && <span className="mc-warn">Insufficient funds for order</span>}
           </div>
         ) : (
           <div className="mc-action">
-            <div className="mc-cost-preview">
+            <div className="mc-cost-preview" style={{ opacity: card.isHalted ? 0.5 : 1 }}>
               {orderType === 'limit' ? `Target Proceeds: ` : `Proceeds: `} 
               <strong>{formatCurrency(orderType === 'limit' ? targetPrice * qty : sellProceeds)}</strong>
             </div>
             <button
               type="button"
               className="mc-execute-btn mc-sell-btn"
-              disabled={!canSell}
+              disabled={card.isHalted || !canSell}
               onClick={() => orderType === 'limit' && onOrder ? onOrder(card.id, 'sell', targetPrice, qty) : onSell(card.id, qty)}
               id={`sell-${card.id}`}
             >
-              {orderType === 'limit' ? 'Place Sell Order' : `Sell ${qty}× ${card.symbol}`}
+              {card.isHalted ? 'TRADING HALTED' : (orderType === 'limit' ? 'Place Sell Order' : `Sell ${qty}× ${card.symbol}`)}
             </button>
-            {!canSell && <span className="mc-warn">Only {holding} held</span>}
+            {!canSell && !card.isHalted && <span className="mc-warn">Only {holding} held</span>}
           </div>
         )}
       </div>

@@ -16,6 +16,7 @@ export type CardDefinition = {
   priceHistory: number[];    // Last 14 tick prices (client-derived)
   publishedByPlayer?: boolean;
   publisherId?: string;
+  isHalted?: boolean;
 };
 
 export type NewsItem = {
@@ -393,6 +394,10 @@ export function buyCard(state: GameState, cardId: string, quantity = 1): GameSta
   const card = state.market.cards.find(c => c.id === cardId);
   if (!card || quantity <= 0) return state;
 
+  if (card.isHalted) {
+    return { ...state, log: [`Trading for ${card.symbol} is currently HALTED by the exchange.`].concat(state.log).slice(0, 12) };
+  }
+
   // Check limited supply
   if (card.supplyMode === 'limited' && card.supply > 0) {
     const available = card.supply - card.owned;
@@ -443,6 +448,10 @@ export function sellCard(state: GameState, cardId: string, quantity = 1): GameSt
   const current = getHoldingCount(state, cardId);
   if (!card || quantity <= 0 || current < quantity) {
     return state;
+  }
+
+  if (card.isHalted) {
+    return { ...state, log: [`Trading for ${card.symbol} is currently HALTED by the exchange.`].concat(state.log).slice(0, 12) };
   }
 
   const proceeds = getSellProceeds(state, cardId, quantity);

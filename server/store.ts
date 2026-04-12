@@ -604,7 +604,14 @@ function buildState(store: Store, userId: string): GameState {
   const profile = store.profiles[userId] ?? createProfile();
   return {
     player: normalizePlayer(profile.player),
-    market: { ...store.market, leaderboard: [...store.market.leaderboard] },
+    market: { 
+      ...store.market, 
+      cards: store.market.cards.map(card => ({
+        ...card,
+        isHalted: isCircuitBreakerActive(store, card.id),
+      })),
+      leaderboard: [...store.market.leaderboard] 
+    },
     log: [...profile.log],
   };
 }
@@ -1030,17 +1037,17 @@ export function advanceGlobalMarket(store: Store) {
     const prevCard = store.market.cards.find(c => c.id === nextCard.id);
     if (prevCard) {
       const priceChange = Math.abs(nextCard.basePrice - prevCard.basePrice) / prevCard.basePrice;
-      if (priceChange > 0.5) {
-        // Price moved more than 50%
-        activateCircuitBreaker(store, nextCard.id, `Price spike detected: ${Math.round(priceChange * 100)}% change`, 300_000);
+      if (priceChange > 0.2) {
+        // Price moved more than 20% (Lowered from 50% for more demo drama)
+        activateCircuitBreaker(store, nextCard.id, `Volatility alert: ${Math.round(priceChange * 100)}% move`, 60_000);
         logAudit({
           action: 'circuit_breaker_activated' as any,
           cardId: nextCard.id,
           details: {
-            reason: `Excessive price movement: ${Math.round(priceChange * 100)}%`,
+            reason: `Excessive volatility: ${Math.round(priceChange * 100)}%`,
             prevPrice: prevCard.basePrice,
             newPrice: nextCard.basePrice,
-            durationMs: 300_000,
+            durationMs: 60_000,
           },
         });
       }
