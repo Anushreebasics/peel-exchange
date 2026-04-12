@@ -36,10 +36,10 @@ import {
   type StoredUser,
   type Store,
   type ValidationError,
-} from './store';
-import { bootstrapBots } from './bots';
-import { prisma } from './prisma';
-import { processLimitOrders } from './matching';
+} from './store.js';
+import { bootstrapBots } from './bots.js';
+import { prisma } from './prisma.js';
+import { processLimitOrders } from './matching.js';
 
 dotenv.config();
 

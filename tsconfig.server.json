@@ -8,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "noEmit": true,
+    "outDir": "dist-server",
     "types": ["node"]
   },
   "include": ["server/**/*.ts", "src/game.ts"]

@@ -5,7 +5,7 @@ import {
   getUserByEmail, 
   sellForUser,
   type Store 
-} from './store';
+} from './store.js';
 
 export async function bootstrapBots(store: Store, commitCallback: () => Promise<void>) {
   const botProfiles = [

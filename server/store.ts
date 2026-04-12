@@ -20,7 +20,7 @@ import {
   type MarketState,
   type NewsItem,
   type PlayerState,
-} from '../src/game';
+} from '../src/game.js';
 
 const STORE_PATH = path.join(process.cwd(), 'server', 'data', 'store.json');
 
