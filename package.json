@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"tsx watch server/index.ts\"",
-    "build": "npm run build:frontend && npm run build:server",
+    "build": "npx prisma db push && npm run build:frontend && npm run build:server",
     "build:frontend": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
     "start": "NODE_ENV=production node dist-server/server/index.js",
