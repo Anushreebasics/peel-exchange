@@ -12,12 +12,12 @@ type Props = {
 };
 
 const toastIcons: Record<ToastData['type'], string> = {
-  buy: '🟢',
-  sell: '🔴',
-  info: '🍌',
-  reward: '🎁',
-  publish: '🚀',
-  error: '⚠️',
+  buy: '',
+  sell: '',
+  info: '',
+  reward: '',
+  publish: '',
+  error: '',
 };
 
 function Toast({ toast, onDismiss }: { toast: ToastData; onDismiss: (id: string) => void }) {

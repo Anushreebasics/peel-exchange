@@ -2,9 +2,9 @@
   "users": [
     {
       "id": "3b1dcb42-1902-47a8-a6e7-bc80db2bc2bb",
-      "email": "banana@example.com",
+      "email": "ledger@example.com",
       "passwordHash": "$2b$10$5ofDBJlU38zV7zCWh0/FAe1pji7GXdA56JnJQUfWKBU3lHdNNu4K.",
-      "displayName": "Banana Pilot",
+      "displayName": "Ledger Pilot",
       "createdAt": "2026-04-05T08:30:35.600Z",
       "lastLoginAt": "2026-04-05T08:31:20.203Z"
     }
@@ -52,7 +52,7 @@
           991
         ],
         "id": "btc",
-        "name": "Banana Treasury Chain",
+        "name": "Ledger Treasury Chain",
         "symbol": "BTCN",
         "category": "Infrastructure",
         "basePrice": 611,
@@ -142,7 +142,7 @@
           332
         ],
         "id": "news",
-        "name": "Daily Peel Press",
+        "name": "Daily Ledger Press",
         "symbol": "DPP",
         "category": "Publishing",
         "basePrice": 188,
@@ -220,7 +220,7 @@
       },
       {
         "id": "n-1354",
-        "title": "Peel Protocol upgrade announced",
+        "title": "Ledger Protocol upgrade announced",
         "body": "Governance vote passes — infrastructure cards rally.",
         "mood": "positive",
         "impact": "DPP +13%",
@@ -230,7 +230,7 @@
     ],
     "leaderboard": [
       {
-        "name": "Banana Pilot",
+        "name": "Ledger Pilot",
         "netWorth": 1500,
         "streak": 1,
         "rank": 1
@@ -239,8 +239,8 @@
   },
   "events": [
     {
-      "id": "banana-shortage",
-      "title": "Banana shortage",
+      "id": "ledger-shortage",
+      "title": "Ledger shortage",
       "body": "All prices surge as supply tightens across the exchange.",
       "mood": "positive",
       "impact": "+10% market-wide",

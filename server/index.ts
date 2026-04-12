@@ -43,7 +43,7 @@ import { processLimitOrders } from './matching';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'banana-trading-company-dev-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'yellow-ledger-secret-key-institutional-grade';
 const PORT = Number(process.env.PORT ?? 3001);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
 
@@ -419,7 +419,7 @@ if (process.env.NODE_ENV === 'production') {
 const server = app.listen(PORT, async () => {
   console.log(`Yellow Ledger API listening on http://localhost:${PORT}`);
   await bootstrapBots(store, commitStore);
-  console.log('🤖 AI Market Makers booted and lurking.');
+  console.log('AI Market Makers booted and lurking.');
 });
 
 io = new SocketServer(server, { cors: { origin: CLIENT_ORIGIN, credentials: true } });

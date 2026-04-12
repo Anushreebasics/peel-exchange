@@ -9,9 +9,9 @@ type Props = {
 };
 
 function moodEmoji(mood: NewsItem['mood']) {
-  if (mood === 'positive') return '📈';
-  if (mood === 'negative') return '📉';
-  return '📊';
+  if (mood === 'positive') return '';
+  if (mood === 'negative') return '';
+  return '';
 }
 
 function moodLabel(mood: NewsItem['mood']) {
@@ -30,15 +30,14 @@ function MarketWeather({ market }: { market: MarketState }) {
   const total = prices.length || 1;
   const sentiment = bullish / total;
 
-  let icon = '☀️';
-  let label = 'Sunny — Strong bull market';
-  if (sentiment < 0.3) { icon = '⛈️'; label = 'Storm — Strong bear market'; }
-  else if (sentiment < 0.5) { icon = '🌧️'; label = 'Overcast — Bearish lean'; }
-  else if (sentiment < 0.65) { icon = '⛅'; label = 'Partly cloudy — Mixed signals'; }
+  let label = 'Extreme — Rollercoaster';
+  if (sentiment < 0.3) { label = 'Strong bear market'; }
+  else if (sentiment < 0.5) { label = 'Bearish lean'; }
+  else if (sentiment < 0.65) { label = 'Mixed signals'; }
 
   return (
     <div className="np-weather">
-      <span className="np-weather-icon">{icon}</span>
+      <span className="np-weather-icon"></span>
       <div>
         <p className="np-weather-label">{label}</p>
         <p className="np-weather-sub">{bullish}/{total} cards trending up · Day {market.day} · Tick {market.tick}</p>
@@ -55,8 +54,8 @@ export default function Newspaper({ news, market, rumors, onBuyRumor, cash }: Pr
       {/* Masthead */}
       <div className="np-masthead">
         <div className="np-masthead-left">
-          <p className="np-edition">The Daily Peel · Day {market.day} · Tick {market.tick}</p>
-          <h2 className="np-title">Banana Times</h2>
+          <p className="np-edition">The Ledger Journal · Day {market.day} · Tick {market.tick}</p>
+          <h2 className="np-title">The Ledger Chronicle</h2>
           <p className="np-tagline">"All the news that moves markets"</p>
         </div>
         <MarketWeather market={market} />
@@ -65,7 +64,7 @@ export default function Newspaper({ news, market, rumors, onBuyRumor, cash }: Pr
       {/* Rumor Mill */}
       {onBuyRumor && rumors !== undefined && cash !== undefined && (
         <div className="np-rumor-mill" style={{ background: 'var(--surface-sunken)', padding: '16px', borderRadius: '8px', marginBottom: '24px', border: '1px solid var(--border)' }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: '1.2rem', color: 'var(--text-strong)' }}>🕵️ The Rumor Mill</h3>
+          <h3 style={{ margin: '0 0 12px', fontSize: '1.2rem', color: 'var(--text-strong)' }}>The Rumor Mill</h3>
           <p style={{ margin: '0 0 16px', color: 'var(--text-muted)' }}>Pay insiders $500 for a hint about upcoming market events.</p>
           <button 
             type="button" 
@@ -94,7 +93,7 @@ export default function Newspaper({ news, market, rumors, onBuyRumor, cash }: Pr
       {lead && (
         <div className={`np-lead np-lead-${lead.mood}`}>
           <div className="np-lead-badge">
-            {moodEmoji(lead.mood)} {moodLabel(lead.mood)}
+            {moodLabel(lead.mood)}
           </div>
           <h3 className="np-lead-headline">{lead.title}</h3>
           <p className="np-lead-body">{lead.body}</p>
@@ -115,7 +114,7 @@ export default function Newspaper({ news, market, rumors, onBuyRumor, cash }: Pr
         <div className="np-columns">
           {rest.map((item) => (
             <article key={item.id} className={`np-article np-article-${item.mood}`}>
-              <div className="np-article-badge">{moodEmoji(item.mood)}</div>
+              <div className="cs-gate-icon">LOCKED</div>
               <h4 className="np-article-headline">{item.title}</h4>
               <p className="np-article-body">{item.body}</p>
               <div className="np-article-footer">
@@ -138,7 +137,7 @@ export default function Newspaper({ news, market, rumors, onBuyRumor, cash }: Pr
             const up = curr !== null && prev !== null ? curr >= prev : true;
             return (
               <span key={`${card.id}-${i}`} className={`np-ticker-item ${up ? 'good' : 'bad'}`}>
-                {card.symbol} {curr ? `$${curr}` : '—'} {up ? '▲' : '▼'}
+                {card.symbol} {curr ? `$${curr}` : '—'} {up ? 'UP' : 'DOWN'}
               </span>
             );
           })}

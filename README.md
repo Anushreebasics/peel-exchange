@@ -1,4 +1,4 @@
-# 🏦 Yellow Ledger
+# Yellow Ledger
 
 **The high-stakes trading simulator where the information is as valuable as the assets.**
 
@@ -6,25 +6,25 @@ Yellow Ledger is a full-stack trading game that puts you in the driver's seat of
 
 ---
 
-## 🎮 The Game: How it Works
+## The Game: How it Works
 
 In Yellow Ledger, you start with **$1,500** and a dream. The market is live 24/7, driven by a heartbeat engine that simulates real-world supply and demand.
 
-### 💰 Trading & Wealth
+### Trading and Wealth
 - **Market Orders:** Execute instant buys and sells against the automated liquidity pool.
 - **Limit Orders:** Set your target price and let the background matching engine fill your orders while you're away.
-- **Slippage & Fees:** Watch out for "Anti-Whale" measures. Large trades move the market and cost more in fees.
+- **Slippage and Fees:** Watch out for "Anti-Whale" measures. Large trades move the market and cost more in fees.
 
-### 🕵️‍♂️ The Information Economy
+### The Information Economy
 - **Rumor Mill:** Spend your cash to buy "Insider Tips." These hints give you a head-start on the next market event or price spike.
 - **Ad Campaigns:** Once you own a position, you can pay to run marketing campaigns that temporarily boost an asset's momentum and demand bias.
 
-### 🚀 Creator Studio (The End Game)
+### Creator Studio (The End Game)
 Once you break the **$5,000 net worth** threshold, you unlock the status of a Market Maker:
 - **Publish Assets:** Design your own tradeable cards with custom volatility and supply models.
 - **Earn Royalties:** Every time another player (or a bot!) trades your asset, you collect a percentage of the fee directly into your creator wallet.
 
-### 🤖 Meet the Bots
+### Meet the Bots
 You aren't trading alone. Three distinct AI archetypes live in the ledger:
 - **Momentum Algos:** Trend-following bots that jump on green candles.
 - **Whale Entities:** Deep-pocketed accounts that cause massive slippage and flash crashes.
@@ -32,7 +32,7 @@ You aren't trading alone. Three distinct AI archetypes live in the ledger:
 
 ---
 
-## 🏗️ The Engineering: Deep Dive
+## The Engineering: Deep Dive
 
 Yellow Ledger is more than just a game; it's a sophisticated financial engine designed to move beyond traditional CRUD patterns.
 
@@ -53,13 +53,12 @@ The backend runs a constant evaluation loop for player **Limit Orders**. It uses
 
 ---
 
-## 🛠️ Internal Architecture
+## Internal Architecture
 
 ```mermaid
 graph TD
     User((Trader)) -->|WebSockets| WS[Socket.io Server]
     User -->|REST API| API[Express API]
-    
     API -->|Prisma| DB[(SQLite Database)]
     
     subgraph Backend Engine
@@ -74,7 +73,7 @@ graph TD
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 | Layer | Responsibility | Technology |
 | :--- | :--- | :--- |
@@ -86,12 +85,12 @@ graph TD
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 ### 1. Installation
 ```bash
-git clone https://github.com/Anushreebasics/peel-exchange.git
-cd peel-exchange
+git clone https://github.com/Anushreebasics/yellow-ledger.git
+cd yellow-ledger
 npm install
 ```
 
@@ -110,5 +109,5 @@ npm run dev
 
 ---
 
-## 📝 License
+## License
 This project is open-source under the MIT License.

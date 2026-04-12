@@ -571,7 +571,7 @@ export function claimDailyReward(state: GameState): GameState {
     },
     log: [
       newStreak > 1
-        ? `Daily reward claimed: ${formatCurrency(reward)} 🍌 (${newStreak}-day streak × ${streakBonus.toFixed(1)}x!)`
+        ? `Daily reward claimed: ${formatCurrency(reward)} (${newStreak}-day streak × ${streakBonus.toFixed(1)}x!)`
         : `Daily reward claimed: ${formatCurrency(reward)}.`,
     ].concat(state.log).slice(0, 12),
   };
@@ -649,7 +649,7 @@ const eventTemplates = [
 ];
 
 const routineTemplates: NewsItem[] = [
-  { id: '', title: 'Liquidity thickens on Yellow Ledger', body: 'Spreads narrowed slightly as market makers entered more positions. Patient traders benefit most.', mood: 'positive', impact: 'lower fees for limit orders' },
+  { id: '', title: 'Liquidity thickens on Yellow Ledger', body: 'Spreads narrowed as market makers entered more positions. Patient traders benefit most.', mood: 'positive', impact: 'lower fees for limit orders' },
   { id: '', title: 'Momentum indicators flash mixed signals', body: 'Short-term trend followers are cautious as oscillators reach neutral zones.', mood: 'neutral', impact: 'watch volatility' },
   { id: '', title: 'Creator wallets distributed on schedule', body: 'Royalty streams credited to all active card publishers. Passive income is the new alpha.', mood: 'positive', impact: 'royalties credited' },
   { id: '', title: 'Scarcity premium builds in limited cards', body: 'As mint counts approach supply caps, early holders are sitting on significant unrealized gains.', mood: 'positive', impact: 'limited supply premium +8%' },

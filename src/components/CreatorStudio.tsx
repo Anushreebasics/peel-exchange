@@ -65,14 +65,14 @@ export default function CreatorStudio({ state, onPublish }: Props) {
   const volatilityLabel = volatility < 0.15 ? 'Low — Stable, steady moves'
     : volatility < 0.25 ? 'Medium — Moderate swings'
     : volatility < 0.35 ? 'High — Wild price action'
-    : 'Extreme — Rollercoaster 🎢';
+    : 'Extreme — Rollercoaster';
 
   return (
     <div className="cs-container">
       {/* Unlock gate */}
       {!unlocked && (
         <div className="cs-gate">
-          <div className="cs-gate-icon">🔒</div>
+          <div className="cs-gate-icon">LOCKED</div>
           <h3>Creator Studio Locked</h3>
           <p>Reach <strong>{formatCurrency(UNLOCK_THRESHOLD)}</strong> net worth to publish your own card to the market.</p>
           <div className="cs-gate-bar">
@@ -147,14 +147,14 @@ export default function CreatorStudio({ state, onPublish }: Props) {
               className={`cs-supply-btn ${supplyMode === 'limited' ? 'cs-supply-active' : ''}`}
               onClick={() => setSupplyMode('limited')}
             >
-              🏷️ Limited — Scarcity premium, early buyers win
+              Limited — Scarcity premium, early buyers win
             </button>
             <button
               type="button"
               className={`cs-supply-btn ${supplyMode === 'unlimited' ? 'cs-supply-active' : ''}`}
               onClick={() => setSupplyMode('unlimited')}
             >
-              ♾️ Unlimited — Like crypto, infinite supply
+              Unlimited — Like crypto, infinite supply
             </button>
           </div>
 
@@ -172,7 +172,7 @@ export default function CreatorStudio({ state, onPublish }: Props) {
             disabled={!unlocked}
             id="creator-publish-btn"
           >
-            {unlocked ? `🚀 Publish ${displaySymbol} to Yellow Ledger` : '🔒 Unlock at $5,000 net worth'}
+            {unlocked ? `Publish ${displaySymbol} to Yellow Ledger` : 'Locked: Need $5,000 net worth'}
           </button>
         </form>
 

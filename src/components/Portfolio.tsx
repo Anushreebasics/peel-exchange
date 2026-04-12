@@ -91,7 +91,7 @@ export default function Portfolio({ state, onSell, onRunAdCampaign }: Props) {
       {/* Holdings */}
       {holdings.length === 0 ? (
         <div className="pf-empty">
-          <span>🍌</span>
+          <span>HOLDINGS</span>
           <p>No positions yet. Head to the Market tab and buy your first card!</p>
         </div>
       ) : (

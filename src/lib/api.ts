@@ -14,7 +14,7 @@ export type AuthResponse = {
   state: GameState;
 };
 
-const TOKEN_KEY = 'banana-trading-company-token';
+const TOKEN_KEY = 'yellow-ledger-v1-token';
 
 export function getStoredToken() {
   if (typeof window === 'undefined') {

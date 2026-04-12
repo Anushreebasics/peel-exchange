@@ -47,11 +47,11 @@ type PageId = 'market' | 'portfolio' | 'creator' | 'leaderboard' | 'news';
 type AuthFormState = { displayName: string; email: string; password: string };
 
 const pages: Array<{ id: PageId; label: string; icon: string }> = [
-  { id: 'market',      label: 'Market',      icon: '📈' },
-  { id: 'portfolio',   label: 'Portfolio',   icon: '💼' },
-  { id: 'creator',     label: 'Creator',     icon: '🚀' },
-  { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
-  { id: 'news',        label: 'News',        icon: '📰' },
+  { id: 'market',      label: 'Market',      icon: '' },
+  { id: 'portfolio',   label: 'Portfolio',   icon: '' },
+  { id: 'creator',     label: 'Creator',     icon: '' },
+  { id: 'leaderboard', label: 'Leaderboard', icon: '' },
+  { id: 'news',        label: 'News',        icon: '' },
 ];
 
 const onboardingStorageKey = 'yellow-ledger-onboarding-v1';
@@ -93,7 +93,7 @@ function AuthModal({
         <button className="modal-close" type="button" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="modal-header">
-          <span className="modal-banana">🏦</span>
+          <span className="modal-ledger"></span>
           <h2 className="modal-title">Yellow Ledger</h2>
           <p className="modal-sub">Sign in to save your progress and appear on the leaderboard</p>
         </div>
@@ -107,7 +107,7 @@ function AuthModal({
           {tab === 'signup' && (
             <div className="modal-field">
               <label htmlFor="modal-name">Display name</label>
-              <input id="modal-name" type="text" placeholder="Banana Ace" value={form.displayName}
+              <input id="modal-name" type="text" placeholder="Trader Ace" value={form.displayName}
                 onChange={e => setForm(f => ({ ...f, displayName: e.target.value }))} required />
             </div>
           )}
@@ -253,17 +253,17 @@ function App() {
 
   const handleClaimReward = async () => {
     await mutate(() => claimDailyReward(state), () => apiClaimDailyReward());
-    addToast('Daily reward claimed! 🎁', 'reward');
+    addToast('Daily reward claimed!', 'reward');
   };
 
   const handleBuyRumor = async () => {
     await mutate(() => buyRumor(state), () => apiBuyRumor());
-    addToast('You bought an insider rumor! 🕵️', 'info');
+    addToast('You bought an insider rumor!', 'info');
   };
 
   const handleRunAdCampaign = async (cardId: string) => {
     await mutate(() => runAdCampaign(state, cardId), () => apiRunAdCampaign(cardId));
-    addToast('Ad campaign launched! 📈', 'info');
+    addToast('Ad campaign launched!', 'info');
   };
 
   const onboarding = useMemo(() => {
@@ -315,7 +315,7 @@ function App() {
     volatility: number; creatorShare: number; supplyMode: SupplyMode; supply: number;
   }) => {
     await mutate(() => publishCard(state, payload), () => apiPublishCard(payload));
-    addToast(`${payload.symbol} launched on Yellow Ledger! 🚀`, 'publish');
+    addToast(`${payload.symbol} launched on Yellow Ledger!`, 'publish');
   };
 
   const handleAdvanceMarket = async () => {
@@ -325,15 +325,15 @@ function App() {
   const handleReset = () => {
     if (authMode === 'server') { void apiResetGame().then(r => setState(r.state)); return; }
     applyState(createInitialState());
-    addToast('Game reset 🍌', 'info');
+    addToast('Game reset', 'info');
   };
 
   const handleAuthSuccess = (user: ApiUser, newState: GameState) => {
-    setAuthUser(user);
+    setAuthUser({ id: user.id, email: user.email, displayName: user.displayName });
     setState(newState);
     setAuthMode('server');
     setShowAuthModal(false);
-    addToast(`Welcome, ${user.displayName}! 🍌`, 'info');
+    addToast(`Welcome, ${user.displayName}!`, 'info');
   };
 
   const handleLogout = () => {
@@ -351,7 +351,7 @@ function App() {
       {/* ── SIDEBAR ─────────────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span className="sidebar-logo">🏦</span>
+          <span className="sidebar-logo"></span>
           <div>
             <p className="sidebar-title">Yellow Ledger</p>
             <p className="sidebar-sub">Yellow Ledger</p>
@@ -432,11 +432,11 @@ function App() {
             <span className="topbar-day">Day {state.market.day} · Tick {state.market.tick}</span>
             {progression.dailyReady && (
               <button type="button" className="topbar-reward-btn" onClick={handleClaimReward} id="claim-reward-btn">
-                🎁 {progression.streak > 1 ? `×${progression.streak} streak` : 'Daily reward'}
+                {progression.streak > 1 ? `×${progression.streak} streak` : 'Daily reward'}
               </button>
             )}
-            <button type="button" className="topbar-ghost" onClick={handleAdvanceMarket} title="Advance market" id="advance-market-btn">⏩</button>
-            <button type="button" className="topbar-ghost" onClick={handleReset} title="Reset run" id="reset-game-btn">↺</button>
+            <button type="button" className="topbar-ghost" onClick={handleAdvanceMarket} title="Advance market" id="advance-market-btn">ADVANCE</button>
+            <button type="button" className="topbar-ghost" onClick={handleReset} title="Reset run" id="reset-game-btn">RESET</button>
             {!authUser && (
               <button type="button" className="topbar-signin" onClick={() => setShowAuthModal(true)} id="topbar-signin-btn">
                 Sign in
@@ -556,7 +556,7 @@ function App() {
             <div className="page-section">
               <div className="page-heading">
                 <div>
-                  <h1 className="page-title">The Banana Times</h1>
+                  <h1 className="page-title">The Ledger Chronicle</h1>
                   <p className="page-desc">Dynamic headlines driven by real price events and market conditions.</p>
                 </div>
               </div>

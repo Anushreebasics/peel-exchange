@@ -311,16 +311,21 @@ p, h1, h2, h3, h4 { margin: 0; }
 }
 .topbar-reward-btn:hover { transform: translateY(-1px); }
 .topbar-ghost {
-  width: 32px; height: 32px;
+  height: 32px;
+  padding: 0 12px;
   border-radius: var(--r-sm);
-  font-size: 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-2);
   background: rgba(30,44,33,0.06);
   border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  transition: background 130ms;
+  transition: background 130ms, transform 130ms;
+  white-space: nowrap;
 }
-.topbar-ghost:hover { background: rgba(30,44,33,0.11); }
+.topbar-ghost:hover { background: rgba(30,44,33,0.11); transform: translateY(-1px); }
 .topbar-signin {
   padding: 7px 14px;
   border-radius: 999px;
@@ -584,7 +589,11 @@ p, h1, h2, h3, h4 { margin: 0; }
 .modal-close:hover { background: rgba(30,44,33,0.15); }
 
 .modal-header { text-align: center; margin-bottom: 24px; }
-.modal-banana { font-size: 2.4rem; display: block; margin-bottom: 10px; }
+.modal-ledger {
+  font-size: 2.8rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
 .modal-title {
   font-family: var(--serif);
   font-size: 1.7rem;
