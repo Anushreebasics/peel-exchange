@@ -1,35 +1,59 @@
-# 🏦 Yellow Ledger: Institutional-Grade Trading Simulator
+# 🏦 Yellow Ledger
 
-> **A living, breathing exchange engine built for speed, transparency, and high-frequency chaos.**
+**The high-stakes trading simulator where the information is as valuable as the assets.**
 
-Yellow Ledger is a full-stack trading simulator that transforms a simple market prototype into a sophisticated financial engine. It combines real-time WebSockets, autonomous AI bots, and a custom-built limit order book to create a marketplace that never sleeps.
-
----
-
-## 🏗️ The Project Evolution
-This project underwent a massive 4-phase backend modernization to move beyond standard CRUD patterns:
-1.  **Persistence Overhaul:** Migrated from volatile JSON file storage to a relational **Prisma + SQLite** database with transaction safety.
-2.  **Real-Time Core:** Implemented **Socket.io** to remove REST polling, enabling sub-100ms market updates across all connected clients.
-3.  **Liquidity Provision:** Designed a **Heartbeat Engine** for autonomous AI bots (Whales, Algos) that trade against the user in real-time.
-4.  **Matching Engine:** Developed an asynchronous **Limit Order Book** that evaluates and fills trades based on price-time priority.
+Yellow Ledger is a full-stack trading game that puts you in the driver's seat of a high-frequency marketplace. Trade volatile assets, exploit insider rumors, launch aggressive marketing campaigns, and eventually build your own financial empire.
 
 ---
 
-## ✨ Core Features
+## 🎮 The Game: How it Works
 
-### 🎮 The Gameplay
-- **The Information Economy:** Don't just trade on charts. Buy **Rumors** to predict market events or pay for **Ad Campaigns** to pump the momentum of your own holdings.
-- **Creator Studio:** Break through the $5,000 net worth threshold to publish your own custom cards, define their supply/volatility, and earn royalties on every subsequent trade.
-- **Progression Loop:** Experience level-up mechanics, daily rewards, and global leaderboard rankings.
+In Yellow Ledger, you start with **$1,500** and a dream. The market is live 24/7, driven by a heartbeat engine that simulates real-world supply and demand.
 
-### ⚙️ The Engineering
-- **Autonomous AI Market Makers:** Three distinct bot archetypes (Momentum, Whale, Retail) keep the market volatile even when you're offline.
-- **Limit Order Matching:** Place targets for entries and exits; our background engine fills your orders the moment the AMM price hits your trigger.
-- **Institutional Guardrails:** Real-time **Anomaly Detection** flags wash-trading, while **Circuit Breakers** automatically halt assets with extreme price spikes.
+### 💰 Trading & Wealth
+- **Market Orders:** Execute instant buys and sells against the automated liquidity pool.
+- **Limit Orders:** Set your target price and let the background matching engine fill your orders while you're away.
+- **Slippage & Fees:** Watch out for "Anti-Whale" measures. Large trades move the market and cost more in fees.
+
+### 🕵️‍♂️ The Information Economy
+- **Rumor Mill:** Spend your cash to buy "Insider Tips." These hints give you a head-start on the next market event or price spike.
+- **Ad Campaigns:** Once you own a position, you can pay to run marketing campaigns that temporarily boost an asset's momentum and demand bias.
+
+### 🚀 Creator Studio (The End Game)
+Once you break the **$5,000 net worth** threshold, you unlock the status of a Market Maker:
+- **Publish Assets:** Design your own tradeable cards with custom volatility and supply models.
+- **Earn Royalties:** Every time another player (or a bot!) trades your asset, you collect a percentage of the fee directly into your creator wallet.
+
+### 🤖 Meet the Bots
+You aren't trading alone. Three distinct AI archetypes live in the ledger:
+- **Momentum Algos:** Trend-following bots that jump on green candles.
+- **Whale Entities:** Deep-pocketed accounts that cause massive slippage and flash crashes.
+- **Retail Swarms:** Highly reactive, emotional traders that respond to news headlines.
 
 ---
 
-## 🛠️ Architecture Overview
+## 🏗️ The Engineering: Deep Dive
+
+Yellow Ledger is more than just a game; it's a sophisticated financial engine designed to move beyond traditional CRUD patterns.
+
+### 1. Real-Time Synchronization (Socket.io)
+Traditional games use polling. Yellow Ledger uses a low-latency **WebSocket heartbeat**. Every 5 seconds, the server calculates new market physics and broadcasts a global `market_update` event to all connected clients simultaneously.
+
+### 2. Relational State Management (Prisma + SQLite)
+We migrated from simple JSON file storage to a robust relational database. This enables:
+- **Transactional Integrity:** Prevents race conditions during rapid trades.
+- **Cold Storage Sync:** The market state is persisted to SQLite via Prisma on every tick to ensure 100% data durability.
+
+### 3. Asynchronous Matching Engine
+The backend runs a constant evaluation loop for player **Limit Orders**. It uses a Price-Time priority model to check if the current AMM price overlaps with player targets, executing trades on their behalf without the client being active.
+
+### 4. Institutional Guardrails
+- **Anomaly Detection:** Real-time flagging of "Wash Trading" or suspicious price deviations.
+- **Circuit Breakers:** Automatic trading halts on assets experiencing unpredicted volatility (Halted state).
+
+---
+
+## 🛠️ Internal Architecture
 
 ```mermaid
 graph TD
@@ -55,52 +79,36 @@ graph TD
 | Layer | Responsibility | Technology |
 | :--- | :--- | :--- |
 | **Frontend** | Reactive UI & Sparklines | React 19, Vite, TypeScript |
-| **Real-time** | Low-latency state sync | Socket.io |
-| **Backend** | API & Auth & Bot AI | Node.js, Express, tsx |
-| **Database** | Relational Ledger & Audit | Prisma ORM, SQLite |
+| **Sync** | Real-time low-latency updates | Socket.io |
+| **Core** | API, Auth & Logic | Node.js, Express, tsx |
+| **Persistence** | Relational Ledger & Audit | Prisma ORM, SQLite |
 | **Security** | Input & Auth | Zod, JWT, Bcrypt |
 
 ---
 
 ## 🏁 Getting Started
 
-### 1. Prerequisites
-- Node.js (v18+)
-- npm
-
-### 2. Installation
+### 1. Installation
 ```bash
 git clone https://github.com/Anushreebasics/peel-exchange.git
 cd peel-exchange
 npm install
 ```
 
-### 3. Database Sync
-Yellow Ledger uses Prisma to manage its relational schema.
+### 2. Database Sync
 ```bash
 npx prisma db push
 npx prisma generate
 ```
 
-### 4. Running the Exchange
-Start the frontend and backend concurrently in watch mode:
+### 3. Boot the Exchange
 ```bash
 npm run dev
 ```
 - **Trade Floor:** [http://localhost:5173](http://localhost:5173)
 - **API Server:** [http://localhost:3001](http://localhost:3001)
-- **WebSockets:** Binds successfully to PORT 3001](http://localhost:3001)
-
----
-
-## 📡 API Endpoints
-
--   **Authentication:** `/api/auth/signup`, `/api/auth/login`
--   **Core Trading:** `/api/game/buy`, `/api/game/sell`, `/api/game/order` (Limit Orders)
--   **Insider Info:** `/api/game/rumor`, `/api/game/advertise`
--   **Admin/Debug:** `/api/debug/audit`, `/api/debug/anomalies`, `/api/debug/circuit-breakers`
 
 ---
 
 ## 📝 License
-This project is open-source under the MIT License. Built with 🍌.
+This project is open-source under the MIT License.
