@@ -8,7 +8,7 @@
     "build": "npm run build:frontend && npm run build:server",
     "build:frontend": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
-    "start": "NODE_ENV=production node dist-server/index.js",
+    "start": "NODE_ENV=production node dist-server/server/index.js",
     "postinstall": "prisma generate",
     "lint": "eslint .",
     "preview": "vite preview"
